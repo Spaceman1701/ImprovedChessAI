@@ -188,4 +188,42 @@ public class BoardPosition {
 
         return moves;
     }
+
+    public List<Integer> generateBlackPawnMoves() {
+        List<Integer> moves = new ArrayList<>();
+        long pawns = black.pawn;
+        long whiteOccupied = white.getOccupied();
+        long notOccupied = ~getOccupied();
+
+
+        long rightAttack = (pawns << 9) & whiteOccupied & (~FILE_H); //position of pawns shifted 9 where there are black pieces and not on file H
+        long leftAttack = (pawns << 7) & whiteOccupied & (-FILE_A);
+        long forwardMove = (pawns << 8) & (notOccupied) & (~RANK_1); //rank 8 would be a promotion
+        long doubleForwardMove = ((((pawns & RANK_7) << 8) & notOccupied) << 8) & notOccupied; //yeah, this is confusing... it moves forward one, then two, to ensure there is an empty path
+        //TODO: en passant
+
+
+        for(int i = 0; i < 64; i++) {
+            if((rightAttack & (1L << i)) != 0) {
+                moves.add(MoveGenerator.createMove(i - 9, i, true, false, false));
+            }
+        }
+        for(int i = 0; i < 64; i++) {
+            if((leftAttack & (1L << i)) != 0) {
+                moves.add(MoveGenerator.createMove(i - 7, i, true, false, false));
+            }
+        }
+        for(int i = 0; i < 64; i++) {
+            if((forwardMove & (1L << i)) != 0) {
+                moves.add(MoveGenerator.createMove(1 - 8, i, false, false, false));
+            }
+        }
+        for(int i = 0; i < 64; i++) {
+            if((doubleForwardMove & (1L << i)) != 0) {
+                moves.add(MoveGenerator.createMove(i - 16, i, false, true, false));
+            }
+        }
+
+        return moves;
+    }
 }

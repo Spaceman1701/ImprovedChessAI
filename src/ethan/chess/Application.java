@@ -7,6 +7,6 @@ public class Application {
     public static void main(String[] args) {
         BoardPosition bp = BoardPosition.defaultInitialPosition();
 
-        System.out.println(bp.generateWhitePawnMoves().size());
+        System.out.println(bp.generateBlackPawnMoves().size());
     }
 }
