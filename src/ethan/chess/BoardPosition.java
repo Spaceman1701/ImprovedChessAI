@@ -161,7 +161,7 @@ public class BoardPosition {
         return whiteValue - blackValue;
     }
 
-    public boolean isPieceAt(Piece piece, boolean white, int location) {
+    public boolean isPieceAt(Piece piece, boolean white, int location) { //mostly for debug
         long board = 0L;
         SidePosition side = this.white;
         if(!white) {
