@@ -34,14 +34,14 @@ public class BoardPosition {
     public static final long[] FILES = {FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H};
 
 
-    public static final long RANK_1 = generateRank(7);
-    public static final long RANK_2 = generateRank(6);
-    public static final long RANK_3 = generateRank(5);
-    public static final long RANK_4 = generateRank(4);
-    public static final long RANK_5 = generateRank(3);
-    public static final long RANK_6 = generateRank(2);
-    public static final long RANK_7 = generateRank(1);
-    public static final long RANK_8 = generateRank(0);
+    public static final long RANK_1 = generateRank(0);
+    public static final long RANK_2 = generateRank(1);
+    public static final long RANK_3 = generateRank(2);
+    public static final long RANK_4 = generateRank(3);
+    public static final long RANK_5 = generateRank(4);
+    public static final long RANK_6 = generateRank(5);
+    public static final long RANK_7 = generateRank(6);
+    public static final long RANK_8 = generateRank(7);
 
     public static final long[] RANKS = {RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8};
 
@@ -72,9 +72,17 @@ public class BoardPosition {
         return bitboard;
     }
 
-    public static BoardPosition fromArray(String[][] board) {
+    public static BoardPosition fromArray(String[][] inputBoard) {
         SidePosition white = new SidePosition();
         SidePosition black = new SidePosition();
+
+        String[][] board = new String[BOARD_DIM][BOARD_DIM];
+
+        for(int i = 0; i < BOARD_DIM; i++) {
+            board[i] = inputBoard[BOARD_DIM - 1 - i];
+        }
+
+        System.out.println(board[0][0]);
 
         for(int i = 0; i < BOARD_SIZE; i++) {
             String piece = board[i / BOARD_DIM][i % BOARD_DIM];
@@ -114,8 +122,9 @@ public class BoardPosition {
     }
 
     public static void printBoard(long bitboard) {
+        long output = Long.reverseBytes(bitboard);
         for(int i = 0; i < BOARD_SIZE; i++) {
-            if (((1L << i) & bitboard) != 0) {
+            if((output & (1L << i)) != 0) {
                 System.out.print("x");
             } else {
                 System.out.print("0");
@@ -150,6 +159,35 @@ public class BoardPosition {
         int blackValue = black.getMaterialValue();
         //evaluate positional advantage and stuff here
         return whiteValue - blackValue;
+    }
+
+    public boolean isPieceAt(Piece piece, boolean white, int location) {
+        long board = 0L;
+        SidePosition side = this.white;
+        if(!white) {
+            side = this.black;
+        }
+        switch (piece) {
+            case PAWN:
+                board = side.pawn;
+                break;
+            case ROOK:
+                board = side.rook;
+                break;
+            case KNIGHT:
+                board = side.knight;
+                break;
+            case BISHOP:
+                board = side.bishop;
+                break;
+            case QUEEN:
+                board = side.queen;
+                break;
+            case KING:
+                board = side.king;
+                break;
+        }
+        return (board & (1L << location)) != 0;
     }
 
     public List<Integer> generateWhitePawnMoves() {
