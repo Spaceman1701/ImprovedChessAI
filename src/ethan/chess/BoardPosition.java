@@ -4,6 +4,7 @@ package ethan.chess;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Ethan on 12/18/2016.
@@ -297,6 +298,36 @@ public class BoardPosition {
         }
 
         return moves;
+    }
+
+    public List<Integer> generateRookMoves(int rookSquare, long occupied, long sideOccupied) {
+        long bitboard = (1L << rookSquare); //maybe use lookup table
+        long reverseBitboard = Long.reverse(bitboard);
+        int rank = rookSquare / BOARD_DIM;
+        int file = rookSquare % BOARD_DIM;
+
+        long verticalMask = file & occupied;
+        long reverseVertMask = Long.reverse(verticalMask);
+
+        long horizontalMask = rank & occupied;
+        long reverseHorizMask = Long.reverse(horizontalMask);
+
+        long vertMoves = (verticalMask ^ (verticalMask - 2 * bitboard)) |
+                Long.reverse(reverseVertMask ^ (reverseVertMask - 2 * reverseBitboard));
+
+        long horizMoves = (horizontalMask ^ (horizontalMask - 2 * bitboard)) |
+                Long.reverse(reverseHorizMask ^ (reverseHorizMask - 2 * reverseBitboard));
+
+        long moves = (vertMoves ^ horizMoves) & (~sideOccupied);
+
+        List<Integer> moveList = new ArrayList<>();
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            if ((moves & (1L << i)) == 0) {
+                moveList.add(MoveGenerator.createMove(rookSquare, i, false, false, false)); //TODO: find captures
+            }
+        }
+
+        return moveList;
     }
 
 }
