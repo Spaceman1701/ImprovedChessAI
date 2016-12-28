@@ -2,6 +2,7 @@ package ethan.chess;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -46,12 +47,45 @@ public class BoardPosition {
     public static final long[] RANKS = {RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8};
 
 
+    public static final long[] DIAGONALS = generateDiagonals();
+
+    public static final long[] ANTI_DIAGONALS = generateAntiDiagonals();
+
+
     private SidePosition white;
     private SidePosition black;
 
     public BoardPosition(SidePosition white, SidePosition black) {
         this.white = white;
         this.black = black;
+    }
+
+    private static long[] generateDiagonals() {
+        long[] diagonals = new long[15];
+        for (int j = 0; j < 15; j ++) {
+            for (int i = 0; i < 64; i++) {
+                int rank = i / 8;
+                int file = i % 8;
+                if (7 + rank - file == j) {
+                    diagonals[j] += (1L << i);
+                }
+            }
+        }
+        return diagonals;
+    }
+
+    private static long[] generateAntiDiagonals() {
+        long[] antiDiagonals = new long[15];
+        for (int j = 0; j < 15; j ++) {
+            for (int i = 0; i < 64; i++) {
+                int rank = i / 8;
+                int file = i % 8;
+                if (rank + file == j) {
+                    antiDiagonals[j] += (1L << i);
+                }
+            }
+        }
+        return antiDiagonals;
     }
 
     private static long generateFile(int f) {

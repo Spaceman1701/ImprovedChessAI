@@ -10,8 +10,6 @@ public class MoveGenerator {
     private static int PAWN_PROMOTE = 17;
     private static int CAPTURE = 18;
 
-    private static final int[] ROOK_MAGIC_BITS = {64 - 12, 64 - 11, };
-
     public static int createMove(int start, int end, boolean capture, boolean pawnStart, boolean pawnPromote) {
         int move = 0;
         move += start << START_BIT;
