@@ -4,11 +4,12 @@ package ethan.chess;
  * Created by Ethan on 12/21/2016.
  */
 public class MoveGenerator {
-    private static int START_BIT = 0;
-    private static int END_BIT = 8;
-    private static int PAWN_START_BIT = 16;
-    private static int PAWN_PROMOTE = 17;
-    private static int CAPTURE = 18;
+    private static int SIDE_BIT = 0;
+    private static int START_BIT = 1;
+    private static int END_BIT = 9;
+    private static int PAWN_START_BIT = 17;
+    private static int PAWN_PROMOTE = 18;
+    private static int CAPTURE = 19;
 
     public static int createMove(int start, int end, boolean capture, boolean pawnStart, boolean pawnPromote) {
         int move = 0;

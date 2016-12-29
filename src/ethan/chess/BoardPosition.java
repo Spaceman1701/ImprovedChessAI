@@ -62,7 +62,7 @@ public class BoardPosition {
 
     private List<Piece> pieceList;
 
-    public BoardPosition(SidePosition white, SidePosition black) {
+    private BoardPosition(SidePosition white, SidePosition black) {
         this.white = white;
         this.black = black;
     }
@@ -160,6 +160,14 @@ public class BoardPosition {
         }
 
         return new BoardPosition(white, black);
+    }
+
+    public static BoardPosition fromMove(BoardPosition base, int move) {
+        int moveStart = MoveGenerator.getStartPosition(move);
+        int moveEnd = MoveGenerator.getEndPosition(move);
+        boolean capture = MoveGenerator.isCapture(move);
+
+        if (())
     }
 
     public static void printBoard(long bitboard) {
