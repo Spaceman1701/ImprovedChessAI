@@ -300,7 +300,7 @@ public class BoardPosition {
         return moves;
     }
 
-    public List<Integer> generateRookMoves(int rookSquare, long occupied, long sideOccupied) {
+    public long generateRookMoves(int rookSquare, long occupied, long sideOccupied) {
         long bitboard = (1L << rookSquare); //maybe use lookup table
         long reverseBitboard = Long.reverse(bitboard);
         int rank = rookSquare / BOARD_DIM;
@@ -320,19 +320,10 @@ public class BoardPosition {
 
         long moves = ((vertMoves & FILES[file]) | (horizMoves & RANKS[rank])) & (~sideOccupied);
 
-        List<Integer> moveList = new ArrayList<>();
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            if ((moves & (1L << i)) != 0) {
-                moveList.add(MoveGenerator.createMove(rookSquare, i, false, false, false)); //TODO: find captures
-            }
-        }
-
-        printBoard(moves);
-
-        return moveList;
+        return moves;
     }
 
-    public List<Integer> generateBishopMoves(int bishopSquare, long occupied, long sideOccupied) {
+    public long generateBishopMoves(int bishopSquare, long occupied, long sideOccupied) {
         long bitboard = (1L << bishopSquare);
         long reverseBitboard = Long.reverse(bitboard);
         int rank = bishopSquare / BOARD_DIM;
@@ -354,16 +345,18 @@ public class BoardPosition {
 
         long moveBitboard = ((diagMoves & DIAGONALS[diag]) | (antiDiagMoves & ANTI_DIAGONALS[antiDiag])) & (~sideOccupied);
 
-        printBoard(moveBitboard);
+        return moveBitboard;
+    }
 
-        List<Integer> moves = new ArrayList<>();
+    public List<Integer> moveBoardToList(long moves, long occupied, int origin) {
+        List<Integer> list = new ArrayList<>();
         for (int i = 0; i < BOARD_SIZE; i++) {
-            if ((moveBitboard & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(bishopSquare, i, false, false, false));
+            if ((moves & (1L << i)) != 0) {
+                list.add(MoveGenerator.createMove(origin, i, ((1L << i) & occupied) != 0, false, false));
             }
         }
 
-        return moves;
+        return list;
     }
 
 }

@@ -6,6 +6,6 @@ package ethan.chess;
 public class Application {
     public static void main(String[] args) {
         BoardPosition bp = BoardPosition.defaultInitialPosition();
-        bp.generateBishopMoves(32, bp.getOccupied(), bp.getWhite().getOccupied());
+        bp.printBoard(bp.generateBishopMoves(32, bp.getOccupied(), bp.getWhite().getOccupied()));
     }
 }
