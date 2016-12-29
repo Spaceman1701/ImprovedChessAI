@@ -232,30 +232,30 @@ public class BoardPosition {
         long notOccupied = ~getOccupied();
 
 
-        long leftAttack = (pawns >>> 9) & blackOccupied & (~FILE_H); //position of pawns shifted 9 where there are black pieces and not on file H
-        long rightAttack = (pawns >>> 7) & blackOccupied & (-FILE_A);
-        long forwardMove = (pawns >>> 8) & (notOccupied) & (~RANK_8); //rank 8 would be a promotion
-        long doubleForwardMove = ((((pawns & RANK_2) >>> 8) & notOccupied) >>> 8) & notOccupied; //yeah, this is confusing... it moves forward one, then two, to ensure there is an empty path
+        long rightAttack = (pawns << 9) & blackOccupied & (~FILE_A); //position of pawns shifted 9 where there are black pieces and not on file H
+        long leftAttack = (pawns << 7) & blackOccupied & (-FILE_H);
+        long forwardMove = (pawns << 8) & (notOccupied) & (~RANK_8); //rank 8 would be a promotion
+        long doubleForwardMove = ((((pawns & RANK_2) << 8) & notOccupied) << 8) & notOccupied; //yeah, this is confusing... it moves forward one, then two, to ensure there is an empty path
         //TODO: en passant
 
-        for(int i = Long.numberOfLeadingZeros(leftAttack); i < 64; i++) {
-            if((leftAttack & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(i + 9, i, true, false, false));
-            }
-        }
         for(int i = Long.numberOfLeadingZeros(rightAttack); i < 64; i++) {
             if((rightAttack & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(i + 7, i, true, false, false));
+                moves.add(MoveGenerator.createMove(i - 9, i, true, false, false));
+            }
+        }
+        for(int i = Long.numberOfLeadingZeros(leftAttack); i < 64; i++) {
+            if((leftAttack & (1L << i)) != 0) {
+                moves.add(MoveGenerator.createMove(i - 7, i, true, false, false));
             }
         }
         for(int i = Long.numberOfLeadingZeros(forwardMove); i < 64; i++) {
             if((forwardMove & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(1 + 8, i, false, false, false));
+                moves.add(MoveGenerator.createMove(1 - 8, i, false, false, false));
             }
         }
         for(int i = Long.numberOfLeadingZeros(doubleForwardMove); i < 64; i++) {
             if((doubleForwardMove & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(i + 16, i, false, true, false));
+                moves.add(MoveGenerator.createMove(i - 16, i, false, true, false));
             }
         }
 
@@ -269,31 +269,31 @@ public class BoardPosition {
         long notOccupied = ~getOccupied();
 
 
-        long rightAttack = (pawns << 9) & whiteOccupied & (~FILE_H); //position of pawns shifted 9 where there are black pieces and not on file H
-        long leftAttack = (pawns << 7) & whiteOccupied & (-FILE_A);
-        long forwardMove = (pawns << 8) & (notOccupied) & (~RANK_1); //rank 8 would be a promotion
-        long doubleForwardMove = ((((pawns & RANK_7) << 8) & notOccupied) << 8) & notOccupied; //yeah, this is confusing... it moves forward one, then two, to ensure there is an empty path
+        long rightAttack = (pawns >>> 9) & whiteOccupied & (~FILE_H); //position of pawns shifted 9 where there are black pieces and not on file H
+        long leftAttack = (pawns >>> 7) & whiteOccupied & (-FILE_A);
+        long forwardMove = (pawns >>> 8) & (notOccupied) & (~RANK_1); //rank 8 would be a promotion
+        long doubleForwardMove = ((((pawns & RANK_7) >>> 8) & notOccupied) >>> 8) & notOccupied; //yeah, this is confusing... it moves forward one, then two, to ensure there is an empty path
         //TODO: en passant
 
 
         for(int i = 0; i < 64; i++) {
             if((rightAttack & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(i - 9, i, true, false, false));
+                moves.add(MoveGenerator.createMove(i + 9, i, true, false, false));
             }
         }
         for(int i = 0; i < 64; i++) {
             if((leftAttack & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(i - 7, i, true, false, false));
+                moves.add(MoveGenerator.createMove(i + 7, i, true, false, false));
             }
         }
         for(int i = 0; i < 64; i++) {
             if((forwardMove & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(1 - 8, i, false, false, false));
+                moves.add(MoveGenerator.createMove(1 + 8, i, false, false, false));
             }
         }
         for(int i = 0; i < 64; i++) {
             if((doubleForwardMove & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(i - 16, i, false, true, false));
+                moves.add(MoveGenerator.createMove(i + 16, i, false, true, false));
             }
         }
 
@@ -306,10 +306,10 @@ public class BoardPosition {
         int rank = rookSquare / BOARD_DIM;
         int file = rookSquare % BOARD_DIM;
 
-        long verticalMask = file & occupied;
+        long verticalMask = FILES[file] & occupied;
         long reverseVertMask = Long.reverse(verticalMask);
 
-        long horizontalMask = rank & occupied;
+        long horizontalMask = RANKS[rank] & occupied;
         long reverseHorizMask = Long.reverse(horizontalMask);
 
         long vertMoves = (verticalMask ^ (verticalMask - 2 * bitboard)) |
@@ -318,16 +318,52 @@ public class BoardPosition {
         long horizMoves = (horizontalMask ^ (horizontalMask - 2 * bitboard)) |
                 Long.reverse(reverseHorizMask ^ (reverseHorizMask - 2 * reverseBitboard));
 
-        long moves = (vertMoves ^ horizMoves) & (~sideOccupied);
+        long moves = ((vertMoves & FILES[file]) | (horizMoves & RANKS[rank])) & (~sideOccupied);
 
         List<Integer> moveList = new ArrayList<>();
         for (int i = 0; i < BOARD_SIZE; i++) {
-            if ((moves & (1L << i)) == 0) {
+            if ((moves & (1L << i)) != 0) {
                 moveList.add(MoveGenerator.createMove(rookSquare, i, false, false, false)); //TODO: find captures
             }
         }
 
+        printBoard(moves);
+
         return moveList;
+    }
+
+    public List<Integer> generateBishopMoves(int bishopSquare, long occupied, long sideOccupied) {
+        long bitboard = (1L << bishopSquare);
+        long reverseBitboard = Long.reverse(bitboard);
+        int rank = bishopSquare / BOARD_DIM;
+        int file = bishopSquare % BOARD_DIM;
+
+        int diag = 7 + rank - file;
+        int antiDiag = rank + file;
+
+        long diagMask = DIAGONALS[diag] & occupied;
+        long antiDiagMask = ANTI_DIAGONALS[antiDiag] & occupied;
+
+        long reverseDiagMask = Long.reverse(diagMask);
+        long reverseAntiDiagMask = Long.reverse(antiDiagMask);
+
+        long diagMoves = (diagMask ^ (diagMask - 2 * bitboard)) |
+                Long.reverse(reverseDiagMask ^ (reverseDiagMask - 2 * reverseBitboard));
+        long antiDiagMoves = (antiDiagMask ^ (antiDiagMask - 2 * bitboard)) |
+                Long.reverse(reverseAntiDiagMask ^ (reverseAntiDiagMask - 2 * reverseBitboard));
+
+        long moveBitboard = ((diagMoves & DIAGONALS[diag]) | (antiDiagMoves & ANTI_DIAGONALS[antiDiag])) & (~sideOccupied);
+
+        printBoard(moveBitboard);
+
+        List<Integer> moves = new ArrayList<>();
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            if ((moveBitboard & (1L << i)) != 0) {
+                moves.add(MoveGenerator.createMove(bishopSquare, i, false, false, false));
+            }
+        }
+
+        return moves;
     }
 
 }
