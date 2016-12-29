@@ -1,8 +1,27 @@
 package ethan.chess;
 
 /**
- * Created by Ethan on 12/21/2016.
+ * Created by Ethan on 12/28/2016.
  */
-public enum Piece {
-    PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING;
+public class Piece {
+    private final PieceType type;
+    private int position;
+
+    public Piece(PieceType type, int position) {
+        this.type = type;
+        this.position = position;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public PieceType getType() {
+        return type;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
 }

@@ -2,9 +2,7 @@ package ethan.chess;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by Ethan on 12/18/2016.
@@ -52,9 +50,17 @@ public class BoardPosition {
 
     public static final long[] ANTI_DIAGONALS = generateAntiDiagonals();
 
+    private static final int NORTH_SHIFT = 8;
+    private static final int NORTH_WEST_SHIFT = 7;
+    private static final int NORTH_EAST_SHIFT = 9;
+    private static final int EAST_SHIFT = 1;
+
+    private static final int[] KNGIHT_ATTACK_SHIFTS = {15, 17, 6, 10}; //for both left and right shifts
 
     private SidePosition white;
     private SidePosition black;
+
+    private List<Piece> pieceList;
 
     public BoardPosition(SidePosition white, SidePosition black) {
         this.white = white;
@@ -160,9 +166,9 @@ public class BoardPosition {
         long output = Long.reverseBytes(bitboard);
         for(int i = 0; i < BOARD_SIZE; i++) {
             if((output & (1L << i)) != 0) {
-                System.out.print("x");
+                System.out.print("X ");
             } else {
-                System.out.print("0");
+                System.out.print("0 ");
             }
             if(i % 8 == 7) {
                 System.out.println();
@@ -196,7 +202,7 @@ public class BoardPosition {
         return whiteValue - blackValue;
     }
 
-    public boolean isPieceAt(Piece piece, boolean white, int location) { //mostly for debug
+    public boolean isPieceAt(PieceType piece, boolean white, int location) { //mostly for debug
         long board = 0L;
         SidePosition side = this.white;
         if(!white) {
@@ -357,6 +363,44 @@ public class BoardPosition {
         }
 
         return list;
+    }
+
+    public long generateQueenMoves(int queenSquare, long occupied, long sideOccupied) {
+        return generateBishopMoves(queenSquare, occupied, sideOccupied) |
+                generateRookMoves(queenSquare, occupied, sideOccupied);
+    }
+
+    public List<Integer> generateWhiteKnightMoves() {
+        long moves = 0L;
+        long knights = white.knight;
+
+        moves += (knights << KNGIHT_ATTACK_SHIFTS[0]) & (~FILE_A); //15
+        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[0]) & (~FILE_H);
+
+        moves += (knights << KNGIHT_ATTACK_SHIFTS[1]) & (~FILE_H); //17
+        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[1]) & (~FILE_A);
+
+        moves += (knights << KNGIHT_ATTACK_SHIFTS[2]) & (~(FILE_H | FILE_G)); //6
+        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[2]) & (~(FILE_A | FILE_B));
+
+        moves += (knights << KNGIHT_ATTACK_SHIFTS[3]) & (~(FILE_A | FILE_B)); //10
+        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[3]) & (~(FILE_H | FILE_G));
+
+        List<Integer> moveList = new ArrayList<>();
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            if ((moves & (1L << i)) != 0) {
+                for (int shift : KNGIHT_ATTACK_SHIFTS) {
+                    if ((knights & (1L << (i + shift))) != 0) {
+                        moveList.add(MoveGenerator.createMove(i + shift, i, false, false, false));
+                    }
+                    if ((knights & (1L << (i - shift))) != 0) {
+                        moveList.add(MoveGenerator.createMove(i - shift, i, false, false, false));
+                    }
+                }
+            }
+        }
+
+        return moveList;
     }
 
 }
