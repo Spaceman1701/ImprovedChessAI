@@ -11,7 +11,7 @@ public class MoveGenerator {
     private static int PAWN_PROMOTE = 18;
     private static int CAPTURE = 19;
 
-    public static int createMove(int start, int end, boolean capture, boolean pawnStart, boolean pawnPromote) {
+    public static int createMove(boolean side, int start, int end, boolean capture, boolean pawnStart, boolean pawnPromote) {
         int move = 0;
         move += start << START_BIT;
         move += end << END_BIT;
@@ -23,6 +23,9 @@ public class MoveGenerator {
         }
         if(pawnPromote) {
             move += 1 << PAWN_PROMOTE;
+        }
+        if (side) {
+            move += 1 << SIDE_BIT;
         }
         return move;
     }
@@ -45,5 +48,9 @@ public class MoveGenerator {
 
     public static int getEndPosition(int move) {
         return (move >>> END_BIT) & 0xFF;
+    }
+
+    public static boolean getSide(int move) {
+        return (move & 0x1) != 0; //if change side bit change this
     }
 }

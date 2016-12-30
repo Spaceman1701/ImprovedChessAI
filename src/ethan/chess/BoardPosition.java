@@ -67,6 +67,11 @@ public class BoardPosition {
         this.black = black;
     }
 
+    public BoardPosition(BoardPosition base) {
+        this.white = new SidePosition(base.getWhite());
+        this.black = new SidePosition(base.getBlack());
+    }
+
     private static long[] generateDiagonals() {
         long[] diagonals = new long[15];
         for (int j = 0; j < 15; j ++) {
@@ -162,12 +167,63 @@ public class BoardPosition {
         return new BoardPosition(white, black);
     }
 
-    public static BoardPosition fromMove(BoardPosition base, int move) {
+    public static BoardPosition fromMove(BoardPosition base, int move) { //this is pretty poorly written
+        BoardPosition copy = new BoardPosition(base);
+
         int moveStart = MoveGenerator.getStartPosition(move);
         int moveEnd = MoveGenerator.getEndPosition(move);
         boolean capture = MoveGenerator.isCapture(move);
+        boolean isWhite = MoveGenerator.getSide(move);
 
-        if (())
+        SidePosition moveSide;
+        SidePosition otherSide;
+        if (isWhite) {
+            moveSide = copy.getWhite();
+            otherSide = copy.getBlack();
+        } else {
+            moveSide = copy.getBlack();
+            otherSide = copy.getWhite();
+        }
+        long fromBit = 1L << moveStart;
+        long toBut = 1L << moveEnd;
+
+        if ((fromBit & moveSide.pawn) != 0) {
+            moveSide.pawn &= ~fromBit;
+            moveSide.pawn |= moveEnd;
+        } else if ((fromBit & moveSide.bishop) != 0) {
+            moveSide.bishop &= ~fromBit;
+            moveSide.bishop |= moveEnd;
+        }else if ((fromBit & moveSide.rook) != 0) {
+            moveSide.rook &= ~fromBit;
+            moveSide.rook |= moveEnd;
+        }else if ((fromBit & moveSide.queen) != 0) {
+            moveSide.queen &= ~fromBit;
+            moveSide.queen |= moveEnd;
+        }else if ((fromBit & moveSide.knight) != 0) {
+            moveSide.knight &= ~fromBit;
+            moveSide.knight |= moveEnd;
+        }else if ((fromBit & moveSide.king) != 0) {
+            moveSide.king &= ~fromBit;
+            moveSide.king |= moveEnd;
+        }
+
+        if (capture) {
+            if ((otherSide.pawn & toBut) != 0) {
+                otherSide.pawn &= ~toBut;
+            } else if ((otherSide.bishop & toBut) != 0) {
+                otherSide.bishop &= ~toBut;
+            } else if ((otherSide.rook & toBut) != 0) {
+                otherSide.rook &= ~toBut;
+            } else if ((otherSide.queen & toBut) != 0) {
+                otherSide.queen &= ~toBut;
+            } else if ((otherSide.knight & toBut) != 0) {
+                otherSide.knight &= ~toBut;
+            } else if ((moveSide.king & toBut) != 0) {
+                otherSide.king &= ~toBut;
+            }
+        }
+
+        return copy;
     }
 
     public static void printBoard(long bitboard) {
@@ -254,22 +310,22 @@ public class BoardPosition {
 
         for(int i = Long.numberOfLeadingZeros(rightAttack); i < 64; i++) {
             if((rightAttack & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(i - 9, i, true, false, false));
+                moves.add(MoveGenerator.createMove(true, i - 9, i, true, false, false));
             }
         }
         for(int i = Long.numberOfLeadingZeros(leftAttack); i < 64; i++) {
             if((leftAttack & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(i - 7, i, true, false, false));
+                moves.add(MoveGenerator.createMove(true, i - 7, i, true, false, false));
             }
         }
         for(int i = Long.numberOfLeadingZeros(forwardMove); i < 64; i++) {
             if((forwardMove & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(1 - 8, i, false, false, false));
+                moves.add(MoveGenerator.createMove(true, 1 - 8, i, false, false, false));
             }
         }
         for(int i = Long.numberOfLeadingZeros(doubleForwardMove); i < 64; i++) {
             if((doubleForwardMove & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(i - 16, i, false, true, false));
+                moves.add(MoveGenerator.createMove(true, i - 16, i, false, true, false));
             }
         }
 
@@ -292,29 +348,31 @@ public class BoardPosition {
 
         for(int i = 0; i < 64; i++) {
             if((rightAttack & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(i + 9, i, true, false, false));
+                moves.add(MoveGenerator.createMove(false, i + 9, i, true, false, false));
             }
         }
         for(int i = 0; i < 64; i++) {
             if((leftAttack & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(i + 7, i, true, false, false));
+                moves.add(MoveGenerator.createMove(false, i + 7, i, true, false, false));
             }
         }
         for(int i = 0; i < 64; i++) {
             if((forwardMove & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(1 + 8, i, false, false, false));
+                moves.add(MoveGenerator.createMove(false, 1 + 8, i, false, false, false));
             }
         }
         for(int i = 0; i < 64; i++) {
             if((doubleForwardMove & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(i + 16, i, false, true, false));
+                moves.add(MoveGenerator.createMove(false, i + 16, i, false, true, false));
             }
         }
 
         return moves;
     }
 
-    public long generateRookMoves(int rookSquare, long occupied, long sideOccupied) {
+    public long generateRookMoves(int rookSquare, Side side) {
+        long sideOccupied = getSidePosition(side).getOccupied();
+        long occupied = getOccupied();
         long bitboard = (1L << rookSquare); //maybe use lookup table
         long reverseBitboard = Long.reverse(bitboard);
         int rank = rookSquare / BOARD_DIM;
@@ -337,7 +395,19 @@ public class BoardPosition {
         return moves;
     }
 
-    public long generateBishopMoves(int bishopSquare, long occupied, long sideOccupied) {
+    private SidePosition getSidePosition(Side side) {
+        switch (side) {
+            case WHITE:
+                return getWhite();
+            case BLACK:
+                return getBlack();
+        }
+        return null;
+    }
+
+    public long generateBishopMoves(int bishopSquare, Side side) {
+        long sideOccupied = getSidePosition(side).getOccupied();
+        long occupied = getOccupied();
         long bitboard = (1L << bishopSquare);
         long reverseBitboard = Long.reverse(bitboard);
         int rank = bishopSquare / BOARD_DIM;
@@ -362,47 +432,48 @@ public class BoardPosition {
         return moveBitboard;
     }
 
-    public List<Integer> moveBoardToList(long moves, long occupied, int origin) {
+    public List<Integer> moveBoardToList(long moves, long occupied, int origin, boolean isWhite) {
         List<Integer> list = new ArrayList<>();
         for (int i = 0; i < BOARD_SIZE; i++) {
             if ((moves & (1L << i)) != 0) {
-                list.add(MoveGenerator.createMove(origin, i, ((1L << i) & occupied) != 0, false, false));
+                list.add(MoveGenerator.createMove(isWhite, origin, i, ((1L << i) & occupied) != 0, false, false));
             }
         }
 
         return list;
     }
 
-    public long generateQueenMoves(int queenSquare, long occupied, long sideOccupied) {
-        return generateBishopMoves(queenSquare, occupied, sideOccupied) |
-                generateRookMoves(queenSquare, occupied, sideOccupied);
+    public long generateQueenMoves(int queenSquare, Side side) {
+        return generateBishopMoves(queenSquare, side) |
+                generateRookMoves(queenSquare, side);
     }
 
     public List<Integer> generateWhiteKnightMoves() {
         long moves = 0L;
         long knights = white.knight;
+        long notWhite = ~white.getOccupied();
 
-        moves += (knights << KNGIHT_ATTACK_SHIFTS[0]) & (~FILE_A); //15
-        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[0]) & (~FILE_H);
+        moves += (knights << KNGIHT_ATTACK_SHIFTS[0]) & (~FILE_A) & notWhite; //15
+        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[0]) & (~FILE_H) & notWhite;
 
-        moves += (knights << KNGIHT_ATTACK_SHIFTS[1]) & (~FILE_H); //17
-        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[1]) & (~FILE_A);
+        moves += (knights << KNGIHT_ATTACK_SHIFTS[1]) & (~FILE_H) & notWhite; //17
+        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[1]) & (~FILE_A) & notWhite;
 
-        moves += (knights << KNGIHT_ATTACK_SHIFTS[2]) & (~(FILE_H | FILE_G)); //6
-        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[2]) & (~(FILE_A | FILE_B));
+        moves += (knights << KNGIHT_ATTACK_SHIFTS[2]) & (~(FILE_H | FILE_G)) & notWhite; //6
+        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[2]) & (~(FILE_A | FILE_B)) & notWhite;
 
-        moves += (knights << KNGIHT_ATTACK_SHIFTS[3]) & (~(FILE_A | FILE_B)); //10
-        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[3]) & (~(FILE_H | FILE_G));
+        moves += (knights << KNGIHT_ATTACK_SHIFTS[3]) & (~(FILE_A | FILE_B)) & notWhite; //10
+        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[3]) & (~(FILE_H | FILE_G)) & notWhite;
 
         List<Integer> moveList = new ArrayList<>();
         for (int i = 0; i < BOARD_SIZE; i++) {
             if ((moves & (1L << i)) != 0) {
                 for (int shift : KNGIHT_ATTACK_SHIFTS) {
                     if ((knights & (1L << (i + shift))) != 0) {
-                        moveList.add(MoveGenerator.createMove(i + shift, i, false, false, false));
+                        moveList.add(MoveGenerator.createMove(false, i + shift, i, false, false, false)); //TODO: fine captures
                     }
                     if ((knights & (1L << (i - shift))) != 0) {
-                        moveList.add(MoveGenerator.createMove(i - shift, i, false, false, false));
+                        moveList.add(MoveGenerator.createMove(false, i - shift, i, false, false, false));
                     }
                 }
             }
