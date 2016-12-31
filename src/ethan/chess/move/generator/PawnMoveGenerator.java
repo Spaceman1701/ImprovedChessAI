@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class PawnMoveGenerator implements SetwiseMoveGenerator {
     @Override
-    public long generateMoveBitboard(long occupied, long sideOccupied, long pieceBitboard) {
+    public long generateMoveBitboard(long occupied, long sideOccupied, long pieceBitboard, byte opponentKingSquare) {
         return 0;
     }
 

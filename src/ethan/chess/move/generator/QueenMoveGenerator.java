@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class QueenMoveGenerator implements NonSetwiseMoveGenerator {
     @Override
-    public long generateMoveBitboard(long occupied, long sideOccupied, byte pieceSquare) {
+    public long generateMoveBitboard(long occupied, long sideOccupied, byte pieceSquare, byte opponentKingSquare) {
         return 0;
     }
 
