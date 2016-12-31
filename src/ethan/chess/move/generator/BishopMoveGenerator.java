@@ -9,7 +9,7 @@ import ethan.chess.Side;
 /**
  * Created by Ethan on 12/30/2016.
  */
-public class BishopMoveGenerator implements MoveGenerator {
+public class BishopMoveGenerator extends MoveGenerator {
 
     @Override
     public long generateMoveBitboard(BoardPosition bp, Side side, byte pieceSquare) {
@@ -37,11 +37,5 @@ public class BishopMoveGenerator implements MoveGenerator {
         long moveBitboard = ((diagMoves & bp.DIAGONALS[diag]) | (antiDiagMoves & bp.ANTI_DIAGONALS[antiDiag])) & (~sideOccupied);
 
         return moveBitboard;
-    }
-
-
-    @Override
-    public List<Move> generateMoves(long moveBitboard, byte piecePosition) {
-        return null;
     }
 }

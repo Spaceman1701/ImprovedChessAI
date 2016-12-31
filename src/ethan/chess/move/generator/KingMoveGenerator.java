@@ -9,14 +9,9 @@ import java.util.List;
 /**
  * Created by Ethan on 12/30/2016.
  */
-public class KingMoveGenerator implements MoveGenerator {
+public class KingMoveGenerator extends MoveGenerator {
     @Override
     public long generateMoveBitboard(BoardPosition bp, Side side, byte pieceSquare) {
         return 0;
-    }
-
-    @Override
-    public List<Move> generateMoves(long moveBitboard, byte pieceSquare) {
-        return null;
     }
 }

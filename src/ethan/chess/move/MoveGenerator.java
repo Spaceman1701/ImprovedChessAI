@@ -8,8 +8,10 @@ import java.util.List;
 /**
  * Created by Ethan on 12/30/2016.
  */
-public interface MoveGenerator {
-    List<Move> generateMoves(long moveBitboard, byte pieceSquare);
+public abstract class MoveGenerator {
+    public List<Move> generateMoves(long moveBitboard, byte pieceSquare) {
+        return null;
+    }
 
-    long generateMoveBitboard(BoardPosition bp, Side side, byte pieceSquare);
+    public abstract long generateMoveBitboard(BoardPosition bp, Side side, byte pieceSquare);
 }
