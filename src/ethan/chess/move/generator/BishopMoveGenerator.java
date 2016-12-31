@@ -3,9 +3,8 @@ package ethan.chess.move.generator;
 import ethan.chess.BoardPosition;
 import ethan.chess.move.Move;
 import ethan.chess.move.MoveGenerator;
-import javafx.geometry.Side;
-
 import java.util.List;
+import ethan.chess.Side;
 
 /**
  * Created by Ethan on 12/30/2016.
@@ -13,13 +12,36 @@ import java.util.List;
 public class BishopMoveGenerator implements MoveGenerator {
 
     @Override
-    public long generateMoveBitboard(BoardPosition bp, Side side) {
-        return 0;
+    public long generateMoveBitboard(BoardPosition bp, Side side, byte pieceSquare) {
+        long sideOccupied = bp.getSidePosition(side).getOccupied();
+        long occupied = bp.getOccupied();
+        long bitboard = (1L << pieceSquare);
+        long reverseBitboard = Long.reverse(bitboard);
+        int rank = pieceSquare / bp.BOARD_DIM;
+        int file = pieceSquare % bp.BOARD_DIM;
+
+        int diag = 7 + rank - file;
+        int antiDiag = rank + file;
+
+        long diagMask = bp.DIAGONALS[diag] & occupied;
+        long antiDiagMask = bp.ANTI_DIAGONALS[antiDiag] & occupied;
+
+        long reverseDiagMask = Long.reverse(diagMask);
+        long reverseAntiDiagMask = Long.reverse(antiDiagMask);
+
+        long diagMoves = (diagMask ^ (diagMask - 2 * bitboard)) |
+                Long.reverse(reverseDiagMask ^ (reverseDiagMask - 2 * reverseBitboard));
+        long antiDiagMoves = (antiDiagMask ^ (antiDiagMask - 2 * bitboard)) |
+                Long.reverse(reverseAntiDiagMask ^ (reverseAntiDiagMask - 2 * reverseBitboard));
+
+        long moveBitboard = ((diagMoves & bp.DIAGONALS[diag]) | (antiDiagMoves & bp.ANTI_DIAGONALS[antiDiag])) & (~sideOccupied);
+
+        return moveBitboard;
     }
 
 
     @Override
-    public List<Move> generateMoves(long moveBitboard) {
+    public List<Move> generateMoves(long moveBitboard, byte piecePosition) {
         return null;
     }
 }

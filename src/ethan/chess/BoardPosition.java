@@ -397,7 +397,7 @@ public class BoardPosition {
         return moves;
     }
 
-    private SidePosition getSidePosition(Side side) {
+    public SidePosition getSidePosition(Side side) {
         switch (side) {
             case WHITE:
                 return getWhite();
@@ -407,7 +407,7 @@ public class BoardPosition {
         return null;
     }
 
-    private SidePosition getOpponentSidePosition(Side side) {
+    public SidePosition getOpponentSidePosition(Side side) {
         switch (side) {
             case BLACK:
                 return getWhite();
@@ -417,32 +417,7 @@ public class BoardPosition {
         return null;
     }
 
-    public long generateBishopMoves(int bishopSquare, Side side) {
-        long sideOccupied = getSidePosition(side).getOccupied();
-        long occupied = getOccupied();
-        long bitboard = (1L << bishopSquare);
-        long reverseBitboard = Long.reverse(bitboard);
-        int rank = bishopSquare / BOARD_DIM;
-        int file = bishopSquare % BOARD_DIM;
 
-        int diag = 7 + rank - file;
-        int antiDiag = rank + file;
-
-        long diagMask = DIAGONALS[diag] & occupied;
-        long antiDiagMask = ANTI_DIAGONALS[antiDiag] & occupied;
-
-        long reverseDiagMask = Long.reverse(diagMask);
-        long reverseAntiDiagMask = Long.reverse(antiDiagMask);
-
-        long diagMoves = (diagMask ^ (diagMask - 2 * bitboard)) |
-                Long.reverse(reverseDiagMask ^ (reverseDiagMask - 2 * reverseBitboard));
-        long antiDiagMoves = (antiDiagMask ^ (antiDiagMask - 2 * bitboard)) |
-                Long.reverse(reverseAntiDiagMask ^ (reverseAntiDiagMask - 2 * reverseBitboard));
-
-        long moveBitboard = ((diagMoves & DIAGONALS[diag]) | (antiDiagMoves & ANTI_DIAGONALS[antiDiag])) & (~sideOccupied);
-
-        return moveBitboard;
-    }
 
     public List<Integer> moveBoardToList(long moves, long occupied, int origin, boolean isWhite) {
         List<Integer> list = new ArrayList<>();
@@ -453,11 +428,6 @@ public class BoardPosition {
         }
 
         return list;
-    }
-
-    public long generateQueenMoves(int queenSquare, Side side) {
-        return generateBishopMoves(queenSquare, side) |
-                generateRookMoves(queenSquare, side);
     }
 
     public List<Integer> generateKnightMoves(Side side) {

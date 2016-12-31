@@ -3,7 +3,7 @@ package ethan.chess.move.generator;
 import ethan.chess.BoardPosition;
 import ethan.chess.move.Move;
 import ethan.chess.move.MoveGenerator;
-import javafx.geometry.Side;
+import ethan.chess.Side;
 
 import java.util.List;
 
@@ -13,12 +13,12 @@ import java.util.List;
 public class RookMoveGenerator implements MoveGenerator {
 
     @Override
-    public long generateMoveBitboard(BoardPosition bp, Side side) {
+    public long generateMoveBitboard(BoardPosition bp, Side side, byte piecePosition) {
         return 0;
     }
 
     @Override
-    public List<Move> generateMoves(long moveBitboard) {
+    public List<Move> generateMoves(long moveBitboard, byte piecePosition) {
         return null;
     }
 }
