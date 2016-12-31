@@ -1,9 +1,9 @@
-package ethan.chess;
+package ethan.chess.move;
 
 /**
  * Created by Ethan on 12/21/2016.
  */
-public class MoveGenerator {
+public class Move {
     private static int SIDE_BIT = 0;
     private static int START_BIT = 1;
     private static int END_BIT = 9;

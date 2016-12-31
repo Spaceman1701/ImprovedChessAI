@@ -1,6 +1,8 @@
 package ethan.chess;
 
 
+import ethan.chess.move.Move;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -170,10 +172,10 @@ public class BoardPosition {
     public static BoardPosition fromMove(BoardPosition base, int move) { //this is pretty poorly written
         BoardPosition copy = new BoardPosition(base);
 
-        int moveStart = MoveGenerator.getStartPosition(move);
-        int moveEnd = MoveGenerator.getEndPosition(move);
-        boolean capture = MoveGenerator.isCapture(move);
-        boolean isWhite = MoveGenerator.getSide(move);
+        int moveStart = Move.getStartPosition(move);
+        int moveEnd = Move.getEndPosition(move);
+        boolean capture = Move.isCapture(move);
+        boolean isWhite = Move.getSide(move);
 
         SidePosition moveSide;
         SidePosition otherSide;
@@ -310,22 +312,22 @@ public class BoardPosition {
 
         for(int i = Long.numberOfLeadingZeros(rightAttack); i < 64; i++) {
             if((rightAttack & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(true, i - 9, i, true, false, false));
+                moves.add(Move.createMove(true, i - 9, i, true, false, false));
             }
         }
         for(int i = Long.numberOfLeadingZeros(leftAttack); i < 64; i++) {
             if((leftAttack & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(true, i - 7, i, true, false, false));
+                moves.add(Move.createMove(true, i - 7, i, true, false, false));
             }
         }
         for(int i = Long.numberOfLeadingZeros(forwardMove); i < 64; i++) {
             if((forwardMove & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(true, 1 - 8, i, false, false, false));
+                moves.add(Move.createMove(true, 1 - 8, i, false, false, false));
             }
         }
         for(int i = Long.numberOfLeadingZeros(doubleForwardMove); i < 64; i++) {
             if((doubleForwardMove & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(true, i - 16, i, false, true, false));
+                moves.add(Move.createMove(true, i - 16, i, false, true, false));
             }
         }
 
@@ -348,22 +350,22 @@ public class BoardPosition {
 
         for(int i = 0; i < 64; i++) {
             if((rightAttack & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(false, i + 9, i, true, false, false));
+                moves.add(Move.createMove(false, i + 9, i, true, false, false));
             }
         }
         for(int i = 0; i < 64; i++) {
             if((leftAttack & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(false, i + 7, i, true, false, false));
+                moves.add(Move.createMove(false, i + 7, i, true, false, false));
             }
         }
         for(int i = 0; i < 64; i++) {
             if((forwardMove & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(false, 1 + 8, i, false, false, false));
+                moves.add(Move.createMove(false, 1 + 8, i, false, false, false));
             }
         }
         for(int i = 0; i < 64; i++) {
             if((doubleForwardMove & (1L << i)) != 0) {
-                moves.add(MoveGenerator.createMove(false, i + 16, i, false, true, false));
+                moves.add(Move.createMove(false, i + 16, i, false, true, false));
             }
         }
 
@@ -405,6 +407,16 @@ public class BoardPosition {
         return null;
     }
 
+    private SidePosition getOpponentSidePosition(Side side) {
+        switch (side) {
+            case BLACK:
+                return getWhite();
+            case WHITE:
+                return getBlack();
+        }
+        return null;
+    }
+
     public long generateBishopMoves(int bishopSquare, Side side) {
         long sideOccupied = getSidePosition(side).getOccupied();
         long occupied = getOccupied();
@@ -436,7 +448,7 @@ public class BoardPosition {
         List<Integer> list = new ArrayList<>();
         for (int i = 0; i < BOARD_SIZE; i++) {
             if ((moves & (1L << i)) != 0) {
-                list.add(MoveGenerator.createMove(isWhite, origin, i, ((1L << i) & occupied) != 0, false, false));
+                list.add(Move.createMove(isWhite, origin, i, ((1L << i) & occupied) != 0, false, false));
             }
         }
 
@@ -448,32 +460,38 @@ public class BoardPosition {
                 generateRookMoves(queenSquare, side);
     }
 
-    public List<Integer> generateWhiteKnightMoves() {
+    public List<Integer> generateKnightMoves(Side side) {
+        SidePosition sidePosition = getSidePosition(side);
         long moves = 0L;
-        long knights = white.knight;
-        long notWhite = ~white.getOccupied();
+        long knights = sidePosition.knight;
+        long notSameSide = ~sidePosition.getOccupied();
+        long occupied = getOccupied();
 
-        moves += (knights << KNGIHT_ATTACK_SHIFTS[0]) & (~FILE_A) & notWhite; //15
-        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[0]) & (~FILE_H) & notWhite;
+        moves += (knights << KNGIHT_ATTACK_SHIFTS[0]) & (~FILE_A) & notSameSide; //15
+        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[0]) & (~FILE_H) & notSameSide;
 
-        moves += (knights << KNGIHT_ATTACK_SHIFTS[1]) & (~FILE_H) & notWhite; //17
-        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[1]) & (~FILE_A) & notWhite;
+        moves += (knights << KNGIHT_ATTACK_SHIFTS[1]) & (~FILE_H) & notSameSide; //17
+        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[1]) & (~FILE_A) & notSameSide;
 
-        moves += (knights << KNGIHT_ATTACK_SHIFTS[2]) & (~(FILE_H | FILE_G)) & notWhite; //6
-        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[2]) & (~(FILE_A | FILE_B)) & notWhite;
+        moves += (knights << KNGIHT_ATTACK_SHIFTS[2]) & (~(FILE_H | FILE_G)) & notSameSide; //6
+        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[2]) & (~(FILE_A | FILE_B)) & notSameSide;
 
-        moves += (knights << KNGIHT_ATTACK_SHIFTS[3]) & (~(FILE_A | FILE_B)) & notWhite; //10
-        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[3]) & (~(FILE_H | FILE_G)) & notWhite;
+        moves += (knights << KNGIHT_ATTACK_SHIFTS[3]) & (~(FILE_A | FILE_B)) & notSameSide; //10
+        moves += (knights >>> KNGIHT_ATTACK_SHIFTS[3]) & (~(FILE_H | FILE_G)) & notSameSide;
 
         List<Integer> moveList = new ArrayList<>();
         for (int i = 0; i < BOARD_SIZE; i++) {
             if ((moves & (1L << i)) != 0) {
                 for (int shift : KNGIHT_ATTACK_SHIFTS) {
+                    boolean capture = false;
+                    if ((occupied & (1L << (i + shift))) != 0) {
+                        capture = true;
+                    }
                     if ((knights & (1L << (i + shift))) != 0) {
-                        moveList.add(MoveGenerator.createMove(false, i + shift, i, false, false, false)); //TODO: fine captures
+                        moveList.add(Move.createMove(side.isWhite(), i + shift, i, capture, false, false)); //TODO: fine captures
                     }
                     if ((knights & (1L << (i - shift))) != 0) {
-                        moveList.add(MoveGenerator.createMove(false, i - shift, i, false, false, false));
+                        moveList.add(Move.createMove(side.isWhite(), i - shift, i, capture, false, false));
                     }
                 }
             }
