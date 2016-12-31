@@ -1,16 +1,18 @@
 package ethan.chess.move.generator;
 
+import ethan.chess.BoardPosition;
 import ethan.chess.move.Move;
-import ethan.chess.move.NonSetwiseMoveGenerator;
+import ethan.chess.move.MoveGenerator;
+import javafx.geometry.Side;
 
 import java.util.List;
 
 /**
  * Created by Ethan on 12/30/2016.
  */
-public class QueenMoveGenerator implements NonSetwiseMoveGenerator {
+public class QueenMoveGenerator implements MoveGenerator {
     @Override
-    public long generateMoveBitboard(long occupied, long sideOccupied, byte pieceSquare, byte opponentKingSquare) {
+    public long generateMoveBitboard(BoardPosition bp, Side side) {
         return 0;
     }
 
