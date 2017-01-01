@@ -12,6 +12,16 @@ import org.junit.Test;
  * Created by Ethan on 12/31/2016.
  */
 public class PawnMoveGeneratorTest {
+    private static final String[][] PAWN_MOVE_TEST = {
+            {"br", "bn", "bb", "bq", "bk", "bb", "bn", "br"},
+            {"bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"},
+            {"  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "},
+            {"  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "},
+            {"  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "},
+            {"  ", "  ", "  ", "wp", "  ", "  ", "  ", "  "},
+            {"wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"},
+            {"wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"}
+    };
     @Test
     public void TestGetMoveBitboardWhite() { //actually tests the constructor
         BoardPosition bp = BoardPosition.defaultInitialPosition();
@@ -28,7 +38,8 @@ public class PawnMoveGeneratorTest {
                 {0, 0, 0, 0, 0, 0, 0, 0}
         };
 
-        assert BitBoardUtil.createBitBoardFromArray(moves) == bitboard : "bitboard = \n" + BitBoardUtil.bitboardString(bitboard);
+        assert BitBoardUtil.createBitBoardFromArray(moves) == bitboard : "bitboard = \n" +
+                BitBoardUtil.bitboardString(bitboard);
 
     }
 
@@ -48,8 +59,17 @@ public class PawnMoveGeneratorTest {
                 {0, 0, 0, 0, 0, 0, 0, 0}
         };
 
-        assert BitBoardUtil.createBitBoardFromArray(moves) == bitboard : "bitboard = \n" + BitBoardUtil.bitboardString(bitboard);
+        assert BitBoardUtil.createBitBoardFromArray(moves) == bitboard : "bitboard = \n" +
+                BitBoardUtil.bitboardString(bitboard);
 
+    }
+
+    @Test
+    public void TestGenerateMovesIrregular() {
+        BoardPosition bp = BoardPosition.fromArray(PAWN_MOVE_TEST);
+        PawnMoveGenerator mg = new PawnMoveGenerator(bp, Side.WHITE);
+        int size = mg.generateMoves().size();
+        assert size == 15 : "size = " + size;
     }
 
     @Test
@@ -64,6 +84,7 @@ public class PawnMoveGeneratorTest {
     public void TestGenerateMovesBlack() {
         BoardPosition bp = BoardPosition.defaultInitialPosition();
         PawnMoveGenerator mg = new PawnMoveGenerator(bp, Side.BLACK);
-        assert mg.generateMoves().size() == 16;
+        int size = mg.generateMoves().size();
+        assert size == 16 : "size = " + size;
     }
 }

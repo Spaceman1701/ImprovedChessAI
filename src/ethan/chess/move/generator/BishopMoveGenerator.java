@@ -1,15 +1,13 @@
 package ethan.chess.move.generator;
 
 import ethan.chess.BoardPosition;
-import ethan.chess.move.Move;
-import ethan.chess.move.MoveGenerator;
-import java.util.List;
+import ethan.chess.move.SlidingMoveGenerator;
 import ethan.chess.Side;
 
 /**
  * Created by Ethan on 12/30/2016.
  */
-public class BishopMoveGenerator extends MoveGenerator {
+public class BishopMoveGenerator extends SlidingMoveGenerator {
 
 
     private byte pieceSquare;
@@ -45,6 +43,10 @@ public class BishopMoveGenerator extends MoveGenerator {
 
     @Override
     public long getMoveBitboard() {
+        return moveBitboard;
+    }
+
+    public long getAttackBitboard() {
         return moveBitboard;
     }
 
