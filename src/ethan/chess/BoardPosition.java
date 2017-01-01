@@ -130,8 +130,6 @@ public class BoardPosition {
             board[i] = inputBoard[BOARD_DIM - 1 - i];
         }
 
-        System.out.println(board[0][0]);
-
         for(int i = 0; i < BOARD_SIZE; i++) {
             String piece = board[i / BOARD_DIM][i % BOARD_DIM];
             int bit = i;

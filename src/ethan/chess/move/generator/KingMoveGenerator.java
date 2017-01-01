@@ -13,7 +13,7 @@ public class KingMoveGenerator extends MoveGenerator {
 
 
     public KingMoveGenerator() {
-        super(null);
+        super(null, null);
     }
 
     @Override
