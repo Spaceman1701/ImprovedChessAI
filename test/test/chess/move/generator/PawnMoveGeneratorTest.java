@@ -13,7 +13,7 @@ import org.junit.Test;
  */
 public class PawnMoveGeneratorTest {
     @Test
-    public void TestGetMoveBitboard() { //actually tests the constructor
+    public void TestGetMoveBitboardWhite() { //actually tests the constructor
         BoardPosition bp = BoardPosition.defaultInitialPosition();
         PawnMoveGenerator mg = new PawnMoveGenerator(bp, Side.WHITE);
         long bitboard = mg.getMoveBitboard();
@@ -24,6 +24,26 @@ public class PawnMoveGeneratorTest {
                 {0, 0, 0, 0, 0, 0, 0, 0},
                 {1, 1, 1, 1, 1, 1, 1, 1},
                 {1, 1, 1, 1, 1, 1, 1, 1},
+                {0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0}
+        };
+
+        assert BitBoardUtil.createBitBoardFromArray(moves) == bitboard : "bitboard = \n" + BitBoardUtil.bitboardString(bitboard);
+
+    }
+
+    @Test
+    public void TestGetMoveBitboardBlack() { //actually tests the constructor
+        BoardPosition bp = BoardPosition.defaultInitialPosition();
+        PawnMoveGenerator mg = new PawnMoveGenerator(bp, Side.BLACK);
+        long bitboard = mg.getMoveBitboard();
+        int[][] moves = {
+                {0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0},
+                {1, 1, 1, 1, 1, 1, 1, 1},
+                {1, 1, 1, 1, 1, 1, 1, 1},
+                {0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0}
         };

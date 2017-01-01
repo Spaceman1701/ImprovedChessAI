@@ -1,5 +1,6 @@
 package ethan.chess.move.generator;
 
+import ethan.chess.BitBoardUtil;
 import ethan.chess.BoardPosition;
 import ethan.chess.SidePosition;
 import ethan.chess.move.Move;
@@ -44,10 +45,6 @@ public class PawnMoveGenerator implements SetwiseMoveGenerator{
         if (side == Side.BLACK) {
             pawns = Long.reverse(pawns);
             opponentOccupied = Long.reverse(opponentOccupied);
-            fileA = Long.reverse(fileA);
-            fileH = Long.reverse(fileH);
-            rank8 = Long.reverse(rank8);
-            rank2 = Long.reverse(rank2);
         }
         notOccupied = ~op.getOccupied();
 
