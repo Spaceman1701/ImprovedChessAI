@@ -9,7 +9,7 @@ import java.util.List;
  * Created by Ethan on 12/31/2016.
  */
 public interface SetwiseMoveGenerator {
-    List<Move> generateMoves(long moveBitboard);
+    List<Move> generateMoves();
 
-    long generateMoveBitboard(BoardPosition bp, Side side);
+    long getMoveBitboard();
 }

@@ -9,7 +9,7 @@ import java.util.List;
  * Created by Ethan on 12/30/2016.
  */
 public abstract class MoveGenerator {
-    public List<Move> generateMoves(long moveBitboard, byte pieceSquare) {
+    public List<Move> generateMoves(long moveBitboard, byte pieceSquare, long occupied) {
         return null;
     }
 

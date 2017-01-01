@@ -11,8 +11,10 @@ public class Move {
     private static int PAWN_PROMOTE = 18;
     private static int CAPTURE = 19;
 
-    public static int createMove(boolean side, int start, int end, boolean capture, boolean pawnStart, boolean pawnPromote) {
-        int move = 0;
+
+    private int move;
+
+    public Move(boolean side, int start, int end, boolean capture, boolean pawnStart, boolean pawnPromote) {
         move += start << START_BIT;
         move += end << END_BIT;
         if(capture) {
@@ -27,30 +29,37 @@ public class Move {
         if (side) {
             move += 1 << SIDE_BIT;
         }
+    }
+
+    public Move(int move) {
+        this.move = move;
+    }
+
+    public int getMove() {
         return move;
     }
 
-    public static boolean isCapture(int move) {
+    public boolean isCapture() {
         return (move & (1 << CAPTURE)) != 0;
     }
 
-    public static boolean isPawnStart(int move) {
+    public boolean isPawnStart() {
         return (move & (1 << PAWN_START_BIT)) != 0;
     }
 
-    public static boolean isPawnPromote(int move) {
+    public boolean isPawnPromote() {
         return (move & (1 << PAWN_PROMOTE)) != 0;
     }
 
-    public static int getStartPosition(int move) {
+    public int getStartPosition() {
         return (move >>> START_BIT) & 0xFF;
     }
 
-    public static int getEndPosition(int move) {
+    public int getEndPosition() {
         return (move >>> END_BIT) & 0xFF;
     }
 
-    public static boolean getSide(int move) {
+    public boolean getSide() {
         return (move & 0x1) != 0; //if change side bit change this
     }
 }

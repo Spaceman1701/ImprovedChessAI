@@ -12,18 +12,35 @@ import java.util.List;
 /**
  * Created by Ethan on 12/30/2016.
  */
-public class PawnMoveGenerator implements SetwiseMoveGenerator {
-    @Override
-    public long generateMoveBitboard(BoardPosition bp, Side side) {
-        SidePosition sp = bp.getSidePosition(side);
-        SidePosition op = bp.getOpponentSidePosition(side);
-        long pawns = sp.pawn;
-        long opponentOccupied = op.getOccupied();
-        long fileA = bp.FILE_A;
-        long fileH = bp.FILE_H;
-        long rank8 = bp.RANK_8;
-        long rank2 = bp.RANK_2;
+public class PawnMoveGenerator implements SetwiseMoveGenerator{
+    private static int[] PAWN_MOVE_SHIFTS = {9, 7, 8, 16};
 
+    private final BoardPosition bp;
+    private final SidePosition sp;
+    private final SidePosition op;
+    private final Side side;
+    private long pawns;
+    private long opponentOccupied;
+    private long fileA;
+    private long fileH;
+    private long rank8;
+    private long rank2;
+    private long notOccupied;
+    private boolean reversed = false;
+
+    private long moveBitboard;
+
+    public PawnMoveGenerator(BoardPosition bp, Side side) {
+        this.bp = bp;
+        sp = bp.getSidePosition(side);
+        op = bp.getOpponentSidePosition(side);
+        this.side = side;
+        pawns = sp.pawn;
+        opponentOccupied = op.getOccupied();
+        fileA = BoardPosition.FILE_A;
+        fileH = BoardPosition.FILE_H;
+        rank8 = BoardPosition.RANK_8;
+        rank2 = BoardPosition.RANK_2;
         if (side == Side.BLACK) {
             pawns = Long.reverse(pawns);
             opponentOccupied = Long.reverse(opponentOccupied);
@@ -32,26 +49,63 @@ public class PawnMoveGenerator implements SetwiseMoveGenerator {
             rank8 = Long.reverse(rank8);
             rank2 = Long.reverse(rank2);
         }
+        notOccupied = ~op.getOccupied();
 
 
-        long notOccupied = ~op.getOccupied();
+        moveBitboard = generateMoveBitboard();
+        if (side == Side.BLACK) {
+            reversed = true;
+            moveBitboard = Long.reverse(moveBitboard);
+        }
+    }
 
-
-        long rightAttack = (pawns << 9) & opponentOccupied & (~fileA); //position of pawns shifted 9 where there are black pieces and not on file H
-        long leftAttack = (pawns << 7) & opponentOccupied & (-fileH);
-        long forwardMove = (pawns << 8) & (notOccupied) & (~rank8); //rank 8 would be a promotion TODO: promotions
-        long doubleForwardMove = ((((pawns & rank2) << 8) & notOccupied) << 8) & notOccupied; //yeah, this is confusing... it moves forward one, then two, to ensure there is an empty path
+    private long generateMoveBitboard() {
+        long rightAttack = (pawns << PAWN_MOVE_SHIFTS[0]) & opponentOccupied & (~fileA); //position of pawns shifted 9 where there are black pieces and not on file H
+        long leftAttack = (pawns << PAWN_MOVE_SHIFTS[1]) & opponentOccupied & (-fileH);
+        long forwardMove = (pawns << PAWN_MOVE_SHIFTS[3]) & (notOccupied) & (~rank8); //rank 8 would be a promotion TODO: promotions
+        long doubleForwardMove = ((((pawns & rank2) << PAWN_MOVE_SHIFTS[3]) & notOccupied) << PAWN_MOVE_SHIFTS[3])
+                & notOccupied; //yeah, this is confusing... it moves forward one, then two, to ensure there is an empty path
         //TODO: en passant
 
-        long result = rightAttack | leftAttack | forwardMove | doubleForwardMove;
-        if (side == Side.BLACK) {
-            result = Long.reverse(result);
-        }
-        return result;
+        return rightAttack | leftAttack | forwardMove | doubleForwardMove;
     }
 
     @Override
-    public List<Move> generateMoves(long moveBitboard) {
-        return null;
+    public long getMoveBitboard() {
+        return moveBitboard;
+    }
+
+    @Override
+    public List<Move> generateMoves() {
+        List<Move> moveList = new ArrayList<>();
+        for (int i = 0; i < BoardPosition.BOARD_SIZE; i++) {
+            if ((moveBitboard & (1L << i)) != 0) {
+                for (int shift : PAWN_MOVE_SHIFTS) {
+                    int startBit;
+                    if (reversed) {
+                        startBit = i + shift;
+                    } else {
+                        startBit = i - shift;
+                    }
+                    if (pawnAt(startBit)) {
+                        boolean capture = false;
+                        boolean pawnStart = false;
+                        if ((sp.getOccupied() & (1L << i)) != 0) {
+                            capture = true;
+                        }
+                        if (((1L << i) & rank2) != 0) { //properly handles reversed bitboard
+                            pawnStart = true;
+                        }
+                        moveList.add(new Move(side.isWhite(), startBit, i, capture, pawnStart, false));
+                    }
+                }
+            }
+        }
+        return moveList;
+    }
+
+    private boolean pawnAt(int i) {
+        long pawns = sp.pawn; //in case the class variable is reversed
+        return (pawns & (1L << i)) != 0;
     }
 }
