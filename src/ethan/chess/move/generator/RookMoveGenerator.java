@@ -12,8 +12,12 @@ import java.util.List;
  */
 public class RookMoveGenerator extends MoveGenerator {
 
-    @Override
-    public long generateMoveBitboard(BoardPosition bp, Side side, byte piecePosition) {
+
+    private byte pieceSquare;
+    private long moves;
+
+    public RookMoveGenerator(BoardPosition bp, Side side, byte piecePosition) {
+        super(bp, side);
         long sideOccupied = bp.getSidePosition(side).getOccupied();
         long occupied = bp.getOccupied();
         long bitboard = (1L << piecePosition); //maybe use lookup table
@@ -33,8 +37,15 @@ public class RookMoveGenerator extends MoveGenerator {
         long horizMoves = (horizontalMask ^ (horizontalMask - 2 * bitboard)) |
                 Long.reverse(reverseHorizMask ^ (reverseHorizMask - 2 * reverseBitboard));
 
-        long moves = ((vertMoves & bp.FILES[file]) | (horizMoves & bp.RANKS[rank])) & (~sideOccupied);
+        moves = ((vertMoves & bp.FILES[file]) | (horizMoves & bp.RANKS[rank])) & (~sideOccupied);
+    }
 
+    @Override
+    public long getMoveBitboard() {
         return moves;
+    }
+
+    public byte getPieceSquare() {
+        return pieceSquare;
     }
 }

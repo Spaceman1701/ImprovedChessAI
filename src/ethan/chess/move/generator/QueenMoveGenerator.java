@@ -11,8 +11,24 @@ import java.util.List;
  * Created by Ethan on 12/30/2016.
  */
 public class QueenMoveGenerator extends MoveGenerator {
+
+    private byte pieceSqure;
+    private long moveBitboard;
+
+    public QueenMoveGenerator(BoardPosition bp, Side side, byte pieceSquare) {
+        super(bp, side);
+        this.pieceSqure = pieceSquare;
+        moveBitboard = new RookMoveGenerator(bp, side, pieceSquare).getMoveBitboard() |
+                new BishopMoveGenerator(bp, side, pieceSquare).getMoveBitboard();
+    }
+
     @Override
-    public long generateMoveBitboard(BoardPosition bp, Side side, byte pieceSquare) {
-        return 0;
+    public long getMoveBitboard() {
+        return moveBitboard;
+    }
+
+    @Override
+    public byte getPieceSquare() {
+        return pieceSqure;
     }
 }

@@ -11,8 +11,14 @@ import ethan.chess.Side;
  */
 public class BishopMoveGenerator extends MoveGenerator {
 
-    @Override
-    public long generateMoveBitboard(BoardPosition bp, Side side, byte pieceSquare) {
+
+    private byte pieceSquare;
+    private Side side;
+
+    private long moveBitboard;
+
+    public BishopMoveGenerator(BoardPosition bp, Side side, byte pieceSquare) {
+        super(bp, side);
         long sideOccupied = bp.getSidePosition(side).getOccupied();
         long occupied = bp.getOccupied();
         long bitboard = (1L << pieceSquare);
@@ -34,8 +40,16 @@ public class BishopMoveGenerator extends MoveGenerator {
         long antiDiagMoves = (antiDiagMask ^ (antiDiagMask - 2 * bitboard)) |
                 Long.reverse(reverseAntiDiagMask ^ (reverseAntiDiagMask - 2 * reverseBitboard));
 
-        long moveBitboard = ((diagMoves & bp.DIAGONALS[diag]) | (antiDiagMoves & bp.ANTI_DIAGONALS[antiDiag])) & (~sideOccupied);
+        moveBitboard = ((diagMoves & bp.DIAGONALS[diag]) | (antiDiagMoves & bp.ANTI_DIAGONALS[antiDiag])) & (~sideOccupied);
+    }
 
+    @Override
+    public long getMoveBitboard() {
         return moveBitboard;
+    }
+
+    @Override
+    public byte getPieceSquare() {
+        return pieceSquare;
     }
 }

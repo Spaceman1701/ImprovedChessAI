@@ -10,8 +10,19 @@ import java.util.List;
  * Created by Ethan on 12/30/2016.
  */
 public class KingMoveGenerator extends MoveGenerator {
+
+
+    public KingMoveGenerator() {
+        super(null);
+    }
+
     @Override
-    public long generateMoveBitboard(BoardPosition bp, Side side, byte pieceSquare) {
+    public long getMoveBitboard() {
         return 0;
+    }
+
+    @Override
+    public byte getPieceSquare() {
+        return (byte)0;
     }
 }
