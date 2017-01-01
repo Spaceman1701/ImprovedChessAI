@@ -1,5 +1,6 @@
 package ethan.chess.move.generator;
 
+import ethan.chess.BitBoardUtil;
 import ethan.chess.BoardPosition;
 import ethan.chess.move.SlidingMoveGenerator;
 import ethan.chess.Side;
