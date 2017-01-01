@@ -226,20 +226,6 @@ public class BoardPosition {
         return copy;
     }
 
-    public static void printBoard(long bitboard) {
-        long output = Long.reverseBytes(bitboard);
-        for(int i = 0; i < BOARD_SIZE; i++) {
-            if((output & (1L << i)) != 0) {
-                System.out.print("X ");
-            } else {
-                System.out.print("0 ");
-            }
-            if(i % 8 == 7) {
-                System.out.println();
-            }
-        }
-    }
-
     public static BoardPosition defaultInitialPosition() {
         return BoardPosition.fromArray(DEFAULT_INITIAL_POSITION);
     }

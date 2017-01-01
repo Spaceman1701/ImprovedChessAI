@@ -1,11 +1,12 @@
-package move.generator;
+package test.chess.move.generator;
 
+import ethan.chess.BitBoardUtil;
 import ethan.chess.BoardPosition;
 import ethan.chess.Side;
 import ethan.chess.move.generator.PawnMoveGenerator;
+import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Ethan on 12/31/2016.
@@ -16,7 +17,18 @@ public class PawnMoveGeneratorTest {
         BoardPosition bp = BoardPosition.defaultInitialPosition();
         PawnMoveGenerator mg = new PawnMoveGenerator(bp, Side.WHITE);
         long bitboard = mg.getMoveBitboard();
+        int[][] moves = {
+                {0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0},
+                {1, 1, 1, 1, 1, 1, 1, 1},
+                {1, 1, 1, 1, 1, 1, 1, 1},
+                {0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0}
+        };
 
+        assert BitBoardUtil.createBitBoardFromArray(moves) == bitboard : "bitboard = \n" + BitBoardUtil.bitboardString(bitboard);
 
     }
 
@@ -25,7 +37,7 @@ public class PawnMoveGeneratorTest {
         BoardPosition bp = BoardPosition.defaultInitialPosition();
         PawnMoveGenerator mg = new PawnMoveGenerator(bp, Side.WHITE);
         int size = mg.generateMoves().size();
-        assertTrue("size = " + size, size == 16);
+        Assert.assertTrue("size = " + size, size == 16);
     }
 
     @Test

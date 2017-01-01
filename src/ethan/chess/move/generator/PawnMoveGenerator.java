@@ -62,12 +62,12 @@ public class PawnMoveGenerator implements SetwiseMoveGenerator{
     private long generateMoveBitboard() {
         long rightAttack = (pawns << PAWN_MOVE_SHIFTS[0]) & opponentOccupied & (~fileA); //position of pawns shifted 9 where there are black pieces and not on file H
         long leftAttack = (pawns << PAWN_MOVE_SHIFTS[1]) & opponentOccupied & (-fileH);
-        long forwardMove = (pawns << PAWN_MOVE_SHIFTS[3]) & (notOccupied) & (~rank8); //rank 8 would be a promotion TODO: promotions
-        long doubleForwardMove = ((((pawns & rank2) << PAWN_MOVE_SHIFTS[3]) & notOccupied) << PAWN_MOVE_SHIFTS[3])
+        long forwardMove = (pawns << PAWN_MOVE_SHIFTS[2]) & (notOccupied) & (~rank8); //rank 8 would be a promotion TODO: promotions
+        long doubleForwardMove = ((((pawns & rank2) << PAWN_MOVE_SHIFTS[2]) & notOccupied) << PAWN_MOVE_SHIFTS[2])
                 & notOccupied; //yeah, this is confusing... it moves forward one, then two, to ensure there is an empty path
         //TODO: en passant
 
-        return rightAttack | leftAttack | forwardMove | doubleForwardMove;
+        return forwardMove | doubleForwardMove | leftAttack | rightAttack;
     }
 
     @Override
@@ -87,7 +87,7 @@ public class PawnMoveGenerator implements SetwiseMoveGenerator{
                     } else {
                         startBit = i - shift;
                     }
-                    if (pawnAt(startBit)) {
+                    if (pawnAt(startBit) && moveLegal(shift, isCapture(i))) {
                         boolean capture = false;
                         boolean pawnStart = false;
                         if ((sp.getOccupied() & (1L << i)) != 0) {
@@ -102,6 +102,19 @@ public class PawnMoveGenerator implements SetwiseMoveGenerator{
             }
         }
         return moveList;
+    }
+    private boolean moveLegal(int shift, boolean isCapture) {
+        return (isCapture && shift == PAWN_MOVE_SHIFTS[0]) | (isCapture && shift == PAWN_MOVE_SHIFTS[1]) |
+                (!isCapture && shift == PAWN_MOVE_SHIFTS[2]) | (!isCapture && shift == PAWN_MOVE_SHIFTS[3]);
+    }
+    private boolean isCapture(int shift) {
+        return (sp.getOccupied() & (1L << shift)) != 0;
+    }
+    private int getStartBit(int i, int shift) {
+        if (reversed) {
+            return i + shift;
+        }
+        return i - shift;
     }
 
     private boolean pawnAt(int i) {
