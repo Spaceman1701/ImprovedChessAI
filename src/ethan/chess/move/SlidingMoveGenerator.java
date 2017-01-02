@@ -10,8 +10,8 @@ import java.util.List;
  * Created by Ethan on 12/30/2016.
  */
 public abstract class SlidingMoveGenerator implements MoveGenerator {
-    private final BoardPosition bp;
-    private final Side side;
+    protected final BoardPosition bp;
+    protected final Side side;
 
     protected SlidingMoveGenerator(BoardPosition bp, Side side) {
         this.bp = bp;
