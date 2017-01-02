@@ -52,11 +52,6 @@ public class BoardPosition {
 
     public static final long[] ANTI_DIAGONALS = generateAntiDiagonals();
 
-    private static final int NORTH_SHIFT = 8;
-    private static final int NORTH_WEST_SHIFT = 7;
-    private static final int NORTH_EAST_SHIFT = 9;
-    private static final int EAST_SHIFT = 1;
-
     private static final int[] KNGIHT_ATTACK_SHIFTS = {15, 17, 6, 10}; //for both left and right shifts
 
     private SidePosition white;
@@ -185,41 +180,41 @@ public class BoardPosition {
             otherSide = copy.getWhite();
         }
         long fromBit = 1L << moveStart;
-        long toBut = 1L << moveEnd;
+        long toBit = 1L << moveEnd;
 
         if ((fromBit & moveSide.pawn) != 0) {
             moveSide.pawn &= ~fromBit;
-            moveSide.pawn |= moveEnd;
+            moveSide.pawn |= toBit;
         } else if ((fromBit & moveSide.bishop) != 0) {
             moveSide.bishop &= ~fromBit;
-            moveSide.bishop |= moveEnd;
+            moveSide.bishop |= toBit;
         }else if ((fromBit & moveSide.rook) != 0) {
             moveSide.rook &= ~fromBit;
-            moveSide.rook |= moveEnd;
+            moveSide.rook |= toBit;
         }else if ((fromBit & moveSide.queen) != 0) {
             moveSide.queen &= ~fromBit;
-            moveSide.queen |= moveEnd;
+            moveSide.queen |= toBit;
         }else if ((fromBit & moveSide.knight) != 0) {
             moveSide.knight &= ~fromBit;
-            moveSide.knight |= moveEnd;
+            moveSide.knight |= toBit;
         }else if ((fromBit & moveSide.king) != 0) {
             moveSide.king &= ~fromBit;
-            moveSide.king |= moveEnd;
+            moveSide.king |= toBit;
         }
 
         if (capture) {
-            if ((otherSide.pawn & toBut) != 0) {
-                otherSide.pawn &= ~toBut;
-            } else if ((otherSide.bishop & toBut) != 0) {
-                otherSide.bishop &= ~toBut;
-            } else if ((otherSide.rook & toBut) != 0) {
-                otherSide.rook &= ~toBut;
-            } else if ((otherSide.queen & toBut) != 0) {
-                otherSide.queen &= ~toBut;
-            } else if ((otherSide.knight & toBut) != 0) {
-                otherSide.knight &= ~toBut;
-            } else if ((moveSide.king & toBut) != 0) {
-                otherSide.king &= ~toBut;
+            if ((otherSide.pawn & toBit) != 0) {
+                otherSide.pawn &= ~toBit;
+            } else if ((otherSide.bishop & toBit) != 0) {
+                otherSide.bishop &= ~toBit;
+            } else if ((otherSide.rook & toBit) != 0) {
+                otherSide.rook &= ~toBit;
+            } else if ((otherSide.queen & toBit) != 0) {
+                otherSide.queen &= ~toBit;
+            } else if ((otherSide.knight & toBit) != 0) {
+                otherSide.knight &= ~toBit;
+            } else if ((moveSide.king & toBit) != 0) {
+                otherSide.king &= ~toBit;
             }
         }
 

@@ -30,6 +30,9 @@ public class PawnMoveGenerator implements MoveGenerator {
     private long notOccupied;
     private boolean reversed = false;
 
+    private long leftPotentialAttack;
+    private long rightPotentialAttack;
+
     private long rightAttack;
     private long leftAttack;
     private long forwardMove;
@@ -61,6 +64,9 @@ public class PawnMoveGenerator implements MoveGenerator {
             leftAttack = Long.reverse(leftAttack);
             forwardMove = Long.reverse(forwardMove);
             doubleForwardMove = Long.reverse(doubleForwardMove);
+
+            leftPotentialAttack = Long.reverse(leftPotentialAttack);
+            rightPotentialAttack = Long.reverse(rightPotentialAttack);
         }
     }
 
@@ -69,6 +75,10 @@ public class PawnMoveGenerator implements MoveGenerator {
         leftAttack = (pawns << LEFT_MOVE) & opponentOccupied & (~BoardPosition.FILE_H);
         forwardMove = (pawns << FORWARD_MOVE) & (notOccupied) & (~BoardPosition.RANK_8); //rank 8 would be a promotion TODO: promotions
         doubleForwardMove = ((((pawns & BoardPosition.RANK_2) << FORWARD_MOVE) & notOccupied) << FORWARD_MOVE);
+
+        rightPotentialAttack = (pawns << RIGHT_MOVE) & sp.getNotOccupied() & (~BoardPosition.FILE_A);
+        leftPotentialAttack = (pawns << LEFT_MOVE) & sp.getNotOccupied() & (~BoardPosition.FILE_H);
+
     }
 
     @Override
@@ -78,7 +88,7 @@ public class PawnMoveGenerator implements MoveGenerator {
 
     @Override
     public long getAttackBitboard() {
-        return rightAttack | leftAttack;
+        return rightPotentialAttack | leftPotentialAttack;
     }
 
     @Override

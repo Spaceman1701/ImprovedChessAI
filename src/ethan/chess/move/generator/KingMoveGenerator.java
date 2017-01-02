@@ -12,7 +12,7 @@ import java.util.List;
  * Created by Ethan on 12/30/2016.
  */
 public class KingMoveGenerator extends SlidingMoveGenerator {
-    private static final int[] SHIFTS = {8, 7, 9};
+    private static final int[] SHIFTS = {8, 7, 9, 1};
 
     private long moveBitboard;
     private byte pieceSquare;
@@ -28,10 +28,12 @@ public class KingMoveGenerator extends SlidingMoveGenerator {
         moveBitboard += (bitboard << 8) & canMove;
         moveBitboard += (bitboard << 7) & canMove & (~BoardPosition.FILE_H);
         moveBitboard += (bitboard << 9) & canMove & (~BoardPosition.FILE_A);
+        moveBitboard += (bitboard << 1) & canMove & (~BoardPosition.FILE_A);
 
         moveBitboard += (bitboard >>> 8) & canMove;
         moveBitboard += (bitboard >>> 7) & canMove & (~BoardPosition.FILE_A);
         moveBitboard += (bitboard >>> 9) & canMove & (~BoardPosition.FILE_H);
+        moveBitboard += (bitboard >>> 1) & canMove & (~BoardPosition.FILE_H);
 
     }
 
