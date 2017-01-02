@@ -78,10 +78,6 @@ public class KnightMoveGenerator implements MoveGenerator {
             }
         }
 
-        for (Move m : moveList) {
-            System.out.println(m.getStartPosition() + ", " + m.getEndPosition());
-        }
-
         return moveList;
     }
 }

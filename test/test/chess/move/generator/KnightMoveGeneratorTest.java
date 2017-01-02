@@ -26,7 +26,6 @@ public class KnightMoveGeneratorTest {
                 {0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0}
         };
-        System.out.println(BitBoardUtil.bitboardString(moves));
         long expected = BitBoardUtil.createBitBoardFromArray(expectedArray);
         assert moves == expected;
     }
