@@ -11,6 +11,8 @@ public final class SidePosition {
     public static final int QUEEN_VALUE = 900;
 
 
+    public final Side side;
+
     public long pawn;
     public long rook;
     public long knight;
@@ -18,9 +20,12 @@ public final class SidePosition {
     public long queen;
     public long king;
 
-    public SidePosition() {}
+    public SidePosition(Side side) {
+        this.side = side;
+    }
 
     public SidePosition(SidePosition other) {
+        this.side = other.side;
         this.pawn = other.pawn;
         this.rook = other.rook;
         this.knight = other.knight;

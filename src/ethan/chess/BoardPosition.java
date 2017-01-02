@@ -4,7 +4,9 @@ package ethan.chess;
 import ethan.chess.move.Move;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by Ethan on 12/18/2016.
@@ -52,21 +54,72 @@ public class BoardPosition {
 
     public static final long[] ANTI_DIAGONALS = generateAntiDiagonals();
 
-    private static final int[] KNGIHT_ATTACK_SHIFTS = {15, 17, 6, 10}; //for both left and right shifts
-
     private SidePosition white;
     private SidePosition black;
 
-    private List<Piece> pieceList;
+    private List<Piece> blackBishop;
+    private List<Piece> blackRook;
+    private List<Piece> blackQueen;
+    private List<Piece> blackKing;
 
-    private BoardPosition(SidePosition white, SidePosition black) {
+    private List<Piece> whiteBishop;
+    private List<Piece> whiteRook;
+    private List<Piece> whiteQueen;
+    private List<Piece> whiteKing;
+
+    private List[] pieceLists = {blackBishop, blackRook, blackQueen, blackKing, whiteBishop, whiteRook, whiteQueen,
+        whiteKing};
+
+    private BoardPosition(SidePosition white, SidePosition black, List<Piece> pieceList) {
         this.white = white;
         this.black = black;
+
+        for (Piece p : pieceList) {
+            if (p.getSide().isWhite()) {
+                switch (p.getType()) {
+                    case BISHOP:
+                        whiteBishop.add(p);
+                        break;
+                    case ROOK:
+                        whiteRook.add(p);
+                        break;
+                    case QUEEN:
+                        whiteQueen.add(p);
+                        break;
+                    case KING:
+                        whiteKing.add(p);
+                        break;
+                }
+            } else {
+                switch (p.getType()) {
+                    case BISHOP:
+                        blackBishop.add(p);
+                        break;
+                    case ROOK:
+                        blackRook.add(p);
+                        break;
+                    case QUEEN:
+                        blackQueen.add(p);
+                        break;
+                    case KING:
+                        blackKing.add(p);
+                        break;
+                }
+            }
+        }
     }
 
     public BoardPosition(BoardPosition base) {
         this.white = new SidePosition(base.getWhite());
         this.black = new SidePosition(base.getBlack());
+
+        for (int i = 0; i < base.pieceLists.length; i++) {
+            List list = pieceLists[i];
+            for (Object o : list) {
+                Piece p = (Piece)o;
+                this.pieceLists[i].add(new Piece(p)); //no way to make array of generic lists. too lazy to write all the way out
+            }
+        }
     }
 
     private static long[] generateDiagonals() {
@@ -116,8 +169,10 @@ public class BoardPosition {
     }
 
     public static BoardPosition fromArray(String[][] inputBoard) {
-        SidePosition white = new SidePosition();
-        SidePosition black = new SidePosition();
+        SidePosition white = new SidePosition(Side.WHITE);
+        SidePosition black = new SidePosition(Side.BLACK);
+
+        List<Piece> pieces = new LinkedList<>();
 
         String[][] board = new String[BOARD_DIM][BOARD_DIM];
 
@@ -142,24 +197,28 @@ public class BoardPosition {
                         break;
                     case 'r':
                         pos.rook += 1L << bit;
+                        pieces.add(new Piece(PieceType.ROOK, pos.side, bit));
                         break;
                     case 'n':
                         pos.knight += 1L << bit;
                         break;
                     case 'b':
                         pos.bishop += 1L << bit;
+                        pieces.add(new Piece(PieceType.BISHOP, pos.side, bit));
                         break;
                     case 'k':
                         pos.king += 1L << bit;
+                        pieces.add(new Piece(PieceType.KING, pos.side, bit));
                         break;
                     case 'q':
                         pos.queen += 1L << bit;
+                        pieces.add(new Piece(PieceType.QUEEN, pos.side, bit));
                         break;
                 }
             }
         }
 
-        return new BoardPosition(white, black);
+        return new BoardPosition(white, black, pieces);
     }
 
     public static BoardPosition fromMove(BoardPosition base, Move move) { //this is pretty poorly written

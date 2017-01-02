@@ -6,10 +6,18 @@ package ethan.chess;
 public class Piece {
     private final PieceType type;
     private int position;
+    private Side side;
 
-    public Piece(PieceType type, int position) {
+    public Piece(PieceType type, Side side, int position) {
         this.type = type;
         this.position = position;
+        this.side = side;
+    }
+
+    public Piece(Piece other) {
+        this.type = other.type;
+        this.position = other.position;
+        this.side = other.side;
     }
 
     public int getPosition() {
@@ -22,6 +30,10 @@ public class Piece {
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    public Side getSide() {
+        return side;
     }
 
 }
