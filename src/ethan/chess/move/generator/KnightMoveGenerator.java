@@ -23,24 +23,29 @@ public class KnightMoveGenerator implements MoveGenerator {
 
     private long moveBitboard;
 
+    private long[] moveBitboards;
+
     public KnightMoveGenerator(BoardPosition bp, Side side) {
         sidePosition = bp.getSidePosition(side);
         knights = sidePosition.knight;
         notSameSide = ~sidePosition.getOccupied();
         occupied = bp.getOccupied();
         this.side = side;
+        moveBitboards = new long[4];
 
-        moveBitboard += (knights << KNIGHT_MOVE_SHIFTS[0]) & (~bp.FILE_A) & notSameSide; //15
-        moveBitboard += (knights >>> KNIGHT_MOVE_SHIFTS[0]) & (~bp.FILE_H) & notSameSide;
+        moveBitboards[0] += (knights << KNIGHT_MOVE_SHIFTS[0]) & (~bp.FILE_H) & notSameSide; //15
+        moveBitboards[0] += (knights >>> KNIGHT_MOVE_SHIFTS[0]) & (~bp.FILE_A) & notSameSide;
 
-        moveBitboard += (knights << KNIGHT_MOVE_SHIFTS[1]) & (~bp.FILE_H) & notSameSide; //17
-        moveBitboard += (knights >>> KNIGHT_MOVE_SHIFTS[1]) & (~bp.FILE_A) & notSameSide;
+        moveBitboards[1] += (knights << KNIGHT_MOVE_SHIFTS[1]) & (~bp.FILE_A) & notSameSide; //17
+        moveBitboards[1] += (knights >>> KNIGHT_MOVE_SHIFTS[1]) & (~bp.FILE_H) & notSameSide;
 
-        moveBitboard += (knights << KNIGHT_MOVE_SHIFTS[2]) & (~(bp.FILE_H | bp.FILE_G)) & notSameSide; //6
-        moveBitboard += (knights >>> KNIGHT_MOVE_SHIFTS[2]) & (~(bp.FILE_A | bp.FILE_B)) & notSameSide;
+        moveBitboards[2] += (knights << KNIGHT_MOVE_SHIFTS[2]) & (~(bp.FILE_H | bp.FILE_G)) & notSameSide; //6
+        moveBitboards[2] += (knights >>> KNIGHT_MOVE_SHIFTS[2]) & (~(bp.FILE_A | bp.FILE_B)) & notSameSide;
 
-        moveBitboard += (knights << KNIGHT_MOVE_SHIFTS[3]) & (~(bp.FILE_A | bp.FILE_B)) & notSameSide; //10
-        moveBitboard += (knights >>> KNIGHT_MOVE_SHIFTS[3]) & (~(bp.FILE_H | bp.FILE_G)) & notSameSide;
+        moveBitboards[3] += (knights << KNIGHT_MOVE_SHIFTS[3]) & (~(bp.FILE_A | bp.FILE_B)) & notSameSide; //10
+        moveBitboards[3] += (knights >>> KNIGHT_MOVE_SHIFTS[3]) & (~(bp.FILE_H | bp.FILE_G)) & notSameSide;
+
+        moveBitboard = moveBitboards[0] | moveBitboards[1] | moveBitboards[2] | moveBitboards[3];
     }
 
     @Override
@@ -56,22 +61,27 @@ public class KnightMoveGenerator implements MoveGenerator {
     public List<Move> generateMoves() {
         List<Move> moveList = new ArrayList<>();
         for (int i = 0; i < BoardPosition.BOARD_SIZE; i++) {
-            if ((moveBitboard & (1L << i)) != 0) {
-                for (int shift : KNIGHT_MOVE_SHIFTS) {
-                    boolean capture = false;
-                    if ((occupied & (1L << (i + shift))) != 0) {
-                        capture = true;
+            for (int j = 0; j < 4; j++) {
+                long bb = moveBitboards[j];
+                int shift = KNIGHT_MOVE_SHIFTS[j];
+                if ((bb & (1L << i)) != 0) {
+                    boolean capture = (occupied & (1L << i)) != 0;
+                    int startOne = i - shift;
+                    int startTwo = i + shift;
+                    if ((knights & (1L << startOne)) != 0) {
+                        moveList.add(new Move(side.isWhite(), startOne, i, capture, false, false));
                     }
-                    if ((knights & (1L << (i + shift))) != 0) {
-                        moveList.add(new Move(side.isWhite(), i + shift, i, capture, false, false));
-                    }
-                    if ((knights & (1L << (i - shift))) != 0) {
-                        moveList.add(new Move(side.isWhite(), i - shift, i, capture, false, false));
+                    if ((knights & (1L << startTwo)) != 0) {
+                        moveList.add(new Move(side.isWhite(), startTwo, i, capture, false, false));
                     }
                 }
             }
         }
 
-        return null;
+        for (Move m : moveList) {
+            System.out.println(m.getStartPosition() + ", " + m.getEndPosition());
+        }
+
+        return moveList;
     }
 }
