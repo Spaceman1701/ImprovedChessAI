@@ -57,22 +57,26 @@ public class BoardPosition {
     private SidePosition white;
     private SidePosition black;
 
-    private List<Piece> blackBishop;
-    private List<Piece> blackRook;
-    private List<Piece> blackQueen;
-    private List<Piece> blackKing;
+    private PieceList blackBishop;
+    private PieceList blackRook;
+    private PieceList blackQueen;
+    private PieceList blackKing;
 
-    private List<Piece> whiteBishop;
-    private List<Piece> whiteRook;
-    private List<Piece> whiteQueen;
-    private List<Piece> whiteKing;
+    private PieceList whiteBishop;
+    private PieceList whiteRook;
+    private PieceList whiteQueen;
+    private PieceList whiteKing;
 
-    private List[] pieceLists = {blackBishop, blackRook, blackQueen, blackKing, whiteBishop, whiteRook, whiteQueen,
+    private PieceList[] pieceLists = {blackBishop, blackRook, blackQueen, blackKing, whiteBishop, whiteRook, whiteQueen,
         whiteKing};
 
-    private BoardPosition(SidePosition white, SidePosition black, List<Piece> pieceList) {
+    private BoardPosition(SidePosition white, SidePosition black, PieceList pieceList) {
         this.white = white;
         this.black = black;
+
+        for (PieceList p : pieceLists) {
+            p = new PieceList();
+        }
 
         for (Piece p : pieceList) {
             if (p.getSide().isWhite()) {
@@ -113,10 +117,13 @@ public class BoardPosition {
         this.white = new SidePosition(base.getWhite());
         this.black = new SidePosition(base.getBlack());
 
+        for (PieceList p : pieceLists) {
+            p = new PieceList();
+        }
+
         for (int i = 0; i < base.pieceLists.length; i++) {
-            List list = pieceLists[i];
-            for (Object o : list) {
-                Piece p = (Piece)o;
+            PieceList list = pieceLists[i];
+            for (Piece p : list) {
                 this.pieceLists[i].add(new Piece(p)); //no way to make array of generic lists. too lazy to write all the way out
             }
         }
@@ -172,7 +179,7 @@ public class BoardPosition {
         SidePosition white = new SidePosition(Side.WHITE);
         SidePosition black = new SidePosition(Side.BLACK);
 
-        List<Piece> pieces = new LinkedList<>();
+        PieceList pieces = new PieceList();
 
         String[][] board = new String[BOARD_DIM][BOARD_DIM];
 
@@ -241,6 +248,14 @@ public class BoardPosition {
         long fromBit = 1L << moveStart;
         long toBit = 1L << moveEnd;
 
+        for (PieceList pl : copy.pieceLists) {
+            for (Piece p : pl) {
+                if (p.getPosition() == moveStart) {
+                    p.setPosition(moveEnd);
+                }
+            }
+        }
+
         if ((fromBit & moveSide.pawn) != 0) {
             moveSide.pawn &= ~fromBit;
             moveSide.pawn |= toBit;
@@ -262,6 +277,15 @@ public class BoardPosition {
         }
 
         if (capture) {
+
+            for (PieceList pl : copy.pieceLists) {
+                for (int i = 0; i < pl.size(); i++) {
+                    if (pl.get(i).getPosition() == moveEnd) {
+                        pl.remove(i);
+                    }
+                }
+            }
+
             if ((otherSide.pawn & toBit) != 0) {
                 otherSide.pawn &= ~toBit;
             } else if ((otherSide.bishop & toBit) != 0) {
@@ -333,6 +357,38 @@ public class BoardPosition {
                 break;
         }
         return (board & (1L << location)) != 0;
+    }
+
+    public PieceList getBlackBishops() {
+        return blackBishop;
+    }
+
+    public PieceList getBlackRook() {
+        return blackRook;
+    }
+
+    public PieceList getBlackQueen() {
+        return blackQueen;
+    }
+
+    public PieceList getBlackKing() {
+        return blackKing;
+    }
+
+    public PieceList getWhiteBishops() {
+        return whiteBishop;
+    }
+
+    public PieceList getWhiteRook() {
+        return whiteRook;
+    }
+
+    public PieceList getWhiteQueen() {
+        return whiteQueen;
+    }
+
+    public PieceList getWhiteKing() {
+        return whiteKing;
     }
 
     public SidePosition getSidePosition(Side side) {
