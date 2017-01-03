@@ -67,16 +67,13 @@ public class BoardPosition {
     private PieceList whiteQueen;
     private PieceList whiteKing;
 
-    private PieceList[] pieceLists = {blackBishop, blackRook, blackQueen, blackKing, whiteBishop, whiteRook, whiteQueen,
-        whiteKing};
+    private PieceList[] pieceLists;
 
     private BoardPosition(SidePosition white, SidePosition black, PieceList pieceList) {
         this.white = white;
         this.black = black;
 
-        for (PieceList p : pieceLists) {
-            p = new PieceList();
-        }
+        initPieceLists();
 
         for (Piece p : pieceList) {
             if (p.getSide().isWhite()) {
@@ -117,16 +114,29 @@ public class BoardPosition {
         this.white = new SidePosition(base.getWhite());
         this.black = new SidePosition(base.getBlack());
 
-        for (PieceList p : pieceLists) {
-            p = new PieceList();
-        }
+        initPieceLists();
 
         for (int i = 0; i < base.pieceLists.length; i++) {
-            PieceList list = pieceLists[i];
+            PieceList list = base.pieceLists[i];
             for (Piece p : list) {
-                this.pieceLists[i].add(new Piece(p)); //no way to make array of generic lists. too lazy to write all the way out
+                this.pieceLists[i].add(new Piece(p));
             }
         }
+    }
+
+    private void initPieceLists() {
+        blackBishop = new PieceList();
+        blackRook = new PieceList();
+        blackQueen = new PieceList();
+        blackKing = new PieceList();
+
+        whiteBishop = new PieceList();
+        whiteRook = new PieceList();
+        whiteQueen = new PieceList();
+        whiteKing = new PieceList();
+
+        pieceLists = new PieceList[] {blackBishop, blackRook, blackQueen, blackKing, whiteBishop, whiteRook, whiteQueen,
+                whiteKing};
     }
 
     private static long[] generateDiagonals() {
@@ -280,7 +290,7 @@ public class BoardPosition {
 
             for (PieceList pl : copy.pieceLists) {
                 for (int i = 0; i < pl.size(); i++) {
-                    if (pl.get(i).getPosition() == moveEnd) {
+                    if (pl.get(i).getPosition() == moveEnd && pl.get(i).getSide().isWhite() != isWhite) {
                         pl.remove(i);
                     }
                 }
@@ -389,6 +399,34 @@ public class BoardPosition {
 
     public PieceList getWhiteKing() {
         return whiteKing;
+    }
+
+    public PieceList getBishops(Side side) {
+        if (side.isWhite()) {
+            return whiteBishop;
+        }
+        return blackBishop;
+    }
+
+    public PieceList getRook(Side side) {
+        if (side.isWhite()) {
+            return whiteRook;
+        }
+        return blackRook;
+    }
+
+    public PieceList getQueen(Side side) {
+        if (side.isWhite()) {
+            return whiteQueen;
+        }
+        return blackQueen;
+    }
+
+    public PieceList getKing(Side side) {
+        if (side.isWhite()) {
+            return whiteKing;
+        }
+        return blackKing;
     }
 
     public SidePosition getSidePosition(Side side) {
