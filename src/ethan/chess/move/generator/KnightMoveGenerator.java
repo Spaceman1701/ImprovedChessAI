@@ -46,6 +46,8 @@ public class KnightMoveGenerator implements MoveGenerator {
         moveBitboards[3] += (knights >>> KNIGHT_MOVE_SHIFTS[3]) & (~(bp.FILE_H | bp.FILE_G)) & notSameSide;
 
         moveBitboard = moveBitboards[0] | moveBitboards[1] | moveBitboards[2] | moveBitboards[3];
+
+        moveBitboard = MoveGenerator.removeIllegalMoves(bp, side, moveBitboard);
     }
 
     @Override

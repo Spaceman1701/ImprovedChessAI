@@ -14,6 +14,7 @@ import java.util.List;
  * Created by Ethan on 1/2/2017.
  */
 public class Perft {
+    public static int captures = 0;
     public static List<Move> generateAllMoves(BoardPosition bp, Side side) {
         long opponentKing = bp.getOpponentSidePosition(side).king;
         PawnMoveGenerator pmg = new PawnMoveGenerator(bp, side);
@@ -73,6 +74,9 @@ public class Perft {
         }
 
         for (Move m : moves) {
+            if (m.isCapture()) {
+                captures++;
+            }
             BoardPosition moved = BoardPosition.fromMove(bp, m);
             total += perft(depth - 1, moved, other);
         }
@@ -87,5 +91,6 @@ public class Perft {
         System.out.println(perft(depth, BoardPosition.defaultInitialPosition(), Side.WHITE));
         long delta = Math.abs(System.nanoTime() - start);
         System.out.println(delta / (1e9) + " seconds");
+        System.out.println(captures);
     }
 }

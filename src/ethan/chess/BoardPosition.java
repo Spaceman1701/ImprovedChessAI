@@ -287,7 +287,6 @@ public class BoardPosition {
         }
 
         if (capture) {
-
             for (PieceList pl : copy.pieceLists) {
                 for (int i = 0; i < pl.size(); i++) {
                     if (pl.get(i).getPosition() == moveEnd && pl.get(i).getSide().isWhite() != isWhite) {

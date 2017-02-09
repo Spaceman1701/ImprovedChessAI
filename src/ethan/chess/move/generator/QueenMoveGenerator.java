@@ -1,6 +1,7 @@
 package ethan.chess.move.generator;
 
 import ethan.chess.BoardPosition;
+import ethan.chess.move.MoveGenerator;
 import ethan.chess.move.SlidingMoveGenerator;
 import ethan.chess.Side;
 
@@ -17,6 +18,8 @@ public class QueenMoveGenerator extends SlidingMoveGenerator {
         this.pieceSqure = pieceSquare;
         moveBitboard = new RookMoveGenerator(bp, side, pieceSquare).getMoveBitboard() |
                 new BishopMoveGenerator(bp, side, pieceSquare).getMoveBitboard();
+        moveBitboard = MoveGenerator.removeIllegalMoves(bp, side, moveBitboard);
+
     }
 
     @Override

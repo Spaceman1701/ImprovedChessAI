@@ -14,4 +14,8 @@ public interface MoveGenerator {
     long getMoveBitboard();
 
     long getAttackBitboard();
+
+    static long removeIllegalMoves(BoardPosition bp, Side side, long moveBitboard) {
+        return (~bp.getOpponentSidePosition(side).king) & moveBitboard;
+    }
 }

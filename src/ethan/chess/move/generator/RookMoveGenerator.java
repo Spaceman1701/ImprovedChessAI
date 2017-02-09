@@ -1,6 +1,7 @@
 package ethan.chess.move.generator;
 
 import ethan.chess.BoardPosition;
+import ethan.chess.move.MoveGenerator;
 import ethan.chess.move.SlidingMoveGenerator;
 import ethan.chess.Side;
 
@@ -35,6 +36,9 @@ public class RookMoveGenerator extends SlidingMoveGenerator {
                 Long.reverse(reverseHorizMask ^ (reverseHorizMask - 2 * reverseBitboard));
 
         moves = ((vertMoves & bp.FILES[file]) | (horizMoves & bp.RANKS[rank])) & (~sideOccupied);
+
+        moves = MoveGenerator.removeIllegalMoves(bp, side, moves);
+
     }
 
     @Override

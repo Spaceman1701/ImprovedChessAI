@@ -3,6 +3,7 @@ package ethan.chess.move.generator;
 import ethan.chess.BoardPosition;
 import ethan.chess.Side;
 import ethan.chess.move.Move;
+import ethan.chess.move.MoveGenerator;
 import ethan.chess.move.SlidingMoveGenerator;
 
 import java.util.ArrayList;
@@ -34,6 +35,8 @@ public class KingMoveGenerator extends SlidingMoveGenerator {
         moveBitboard += (bitboard >>> 7) & canMove & (~BoardPosition.FILE_A);
         moveBitboard += (bitboard >>> 9) & canMove & (~BoardPosition.FILE_H);
         moveBitboard += (bitboard >>> 1) & canMove & (~BoardPosition.FILE_H);
+
+        moveBitboard = MoveGenerator.removeIllegalMoves(bp, side, moveBitboard);
 
     }
 

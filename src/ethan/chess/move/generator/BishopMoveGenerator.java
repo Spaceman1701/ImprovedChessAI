@@ -2,6 +2,7 @@ package ethan.chess.move.generator;
 
 import ethan.chess.BitBoardUtil;
 import ethan.chess.BoardPosition;
+import ethan.chess.move.MoveGenerator;
 import ethan.chess.move.SlidingMoveGenerator;
 import ethan.chess.Side;
 
@@ -40,6 +41,7 @@ public class BishopMoveGenerator extends SlidingMoveGenerator {
                 Long.reverse(reverseAntiDiagMask ^ (reverseAntiDiagMask - 2 * reverseBitboard));
 
         moveBitboard = ((diagMoves & bp.DIAGONALS[diag]) | (antiDiagMoves & bp.ANTI_DIAGONALS[antiDiag])) & (~sideOccupied);
+        moveBitboard = MoveGenerator.removeIllegalMoves(bp, side, moveBitboard);
     }
 
     @Override
